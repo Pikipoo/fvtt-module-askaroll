@@ -1,16 +1,11 @@
 {
   "compilerOptions": {
-    "types": [
-      "@league-of-foundry-developers/foundry-vtt-types",
-    ],
-    "target": "ESNext",
+    "types": ["fvtt-types"],
+    "target": "esnext",
     "useDefineForClassFields": true,
-    "module": "ESNext",
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
-    "moduleResolution": "Node",
+    "module": "esnext",
+    "lib": ["esnext", "dom"],
+    "moduleResolution": "bundler",
     "strict": true,
     "sourceMap": true,
     "resolveJsonModule": true,
@@ -24,7 +19,5 @@
     "noImplicitAny": true,
     "skipLibCheck": true
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }
