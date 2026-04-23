@@ -1,17 +1,32 @@
 {
   "$schema": "https://json.schemastore.org/foundryvtt-manifest.json",
-  "id": "foundry-module-ts",
-  "title": "Typescript Template Module",
-  "description": "A template module using Typescript. You should change name, title, and description in module.json.",
-  "version": "1.0.0",
+  "id": "askaroll",
+  "title": "Ask A Roll",
+  "description": "Ask your players to make rolls for you.",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "Pikipoo",
+      "url": "https://github.com/pikipoo"
+    }
+  ],
   "packs": [],
-  "system": [],
-  "dependencies": [],
+  "system": ["wfrp4e"],
+  "relationships": [
+    {
+      "id": "wfrp4e",
+      "type": "system",
+      "manifest": "https://github.com/moo-man/WFRP4e-FoundryVTT/releases/latest/download/system.json",
+      "compatibility": {
+        "verified": "13"
+      }
+    }
+  ],
   "scripts": [],
   "compatibility": {
-    "minimum": "9",
-    "verified": "10",
-    "maximum": "10"
+    "minimum": "13",
+    "verified": "13",
+    "maximum": "13"
   },
   "languages": [
     {

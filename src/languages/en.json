@@ -1,6 +1,6 @@
 {
-  "MYMODULE.dog-browser": "Dog browser",
-  "MYMODULE.dogs": "Dogs",
-  "MYMODULE.fetch-random-dog": "Fetch random dog photo",
-  "MYMODULE.random-dog-alt": "Image of a random dog"
+  "askaroll.dog-browser": "Dog browser",
+  "askaroll.dogs": "Dogs",
+  "askaroll.fetch-random-dog": "Fetch random dog photo",
+  "askaroll.random-dog-alt": "Image of a random dog"
 }
