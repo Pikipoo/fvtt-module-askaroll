@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 // Do not remove this import. If you do Vite will think your styles are dead
 // code and not include them in the build output.
 import "../styles/style.scss";
@@ -14,12 +16,15 @@ Hooks.once("init", () => {
   module.dogBrowser = new DogBrowser();
 });
 
-Hooks.on("renderActorDirectory", (_: Application, html: JQuery) => {
-  const button = $(
-    `<button class="cc-sidebar-button" type="button">🐶</button>`
-  );
-  button.on("click", () => {
+Hooks.on("renderActorDirectory", (_application, element) => {
+  const button = document.createElement("button");
+  button.className = "cc-sidebar-button";
+  button.type = "button";
+  button.textContent = "🐶";
+  button.addEventListener("click", () => {
     module.dogBrowser.render(true);
   });
-  html.find(".directory-header .action-buttons").append(button);
+  element
+    .querySelector(".directory-header .action-buttons")
+    ?.append(button);
 });
