@@ -3,14 +3,14 @@
 import "../styles/style.scss";
 import DogBrowser from "./apps/dogBrowser";
 import { moduleId } from "./constants";
-import { MyModule } from "./types";
+import { askaroll } from "./types";
 
-let module: MyModule;
+let module: askaroll;
 
 Hooks.once("init", () => {
   console.log(`Initializing ${moduleId}`);
 
-  module = (game as Game).modules.get(moduleId) as MyModule;
+  module = (game as Game).modules.get(moduleId) as askaroll;
   module.dogBrowser = new DogBrowser();
 });
 

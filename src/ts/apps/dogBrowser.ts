@@ -4,7 +4,7 @@ export default class DogBrowser extends Application {
   private imageUrl? = "";
 
   override get title(): string {
-    return (game as Game).i18n.localize("MYMODULE.dog-browser");
+    return (game as Game).i18n.localize("askaroll.dog-browser");
   }
 
   static override get defaultOptions(): ApplicationOptions {
@@ -33,7 +33,7 @@ export default class DogBrowser extends Application {
     event.preventDefault();
     const button = event.currentTarget as HTMLElement;
     const action = button.dataset.action;
-    // const module = (game as Game).modules.get(moduleName) as MyModule;
+    // const module = (game as Game).modules.get(moduleName) as askaroll;
 
     switch (action) {
       case "randomize-dog":
