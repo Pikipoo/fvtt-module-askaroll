@@ -4,16 +4,16 @@ export default class DogBrowser extends Application {
   private imageUrl? = "";
 
   override get title(): string {
-    return (game as Game).i18n.localize("MYMODULE.dog-browser");
+    return game?.i18n?.localize("askaroll.dog-browser") ?? "";
   }
 
-  static override get defaultOptions(): ApplicationOptions {
+  static override get defaultOptions(): Application.Options {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: "dog-browser",
       template: `modules/${moduleId}/templates/dogs.hbs`,
       width: 720,
       height: 720,
-    }) as ApplicationOptions;
+    }) as Application.Options;
   }
 
   override getData() {
@@ -33,7 +33,7 @@ export default class DogBrowser extends Application {
     event.preventDefault();
     const button = event.currentTarget as HTMLElement;
     const action = button.dataset.action;
-    // const module = (game as Game).modules.get(moduleName) as MyModule;
+    // const module = (game as Game).modules.get(moduleName) as askaroll;
 
     switch (action) {
       case "randomize-dog":

@@ -1,7 +1,7 @@
 {
-  "name": "foundry-module-ts",
-  "version": "1.0.0",
-  "description": "A template project for FoundryVTT modules using Typescript",
+  "name": "askaroll",
+  "version": "0.0.1",
+  "description": "Ask your players to make rolls for you.",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -9,11 +9,11 @@
     "watch": "tsc && vite build --watch"
   },
   "devDependencies": {
-    "@league-of-foundry-developers/foundry-vtt-types": "^9.280.0",
-    "rollup-plugin-copy": "^3.4.0",
-    "rollup-plugin-scss": "^3.0.0",
-    "sass": "^1.54.8",
-    "typescript": "^4.8.2",
-    "vite": "^3.2.7"
+    "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
+    "rollup-plugin-copy": "^3.5.0",
+    "rollup-plugin-scss": "^4.0.1",
+    "sass": "^1.99.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.10"
   }
 }
