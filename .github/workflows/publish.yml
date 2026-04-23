@@ -1,8 +1,13 @@
-name: Publish release
+name: CI/CD - Publish release
+run-name: CI/CD - [${{ github.event.release.name }}] Publish release by ${{ github.actor }}
 
 on:
   release:
     types: [published]
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.release.name }}"
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -14,7 +19,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 24
 
       - name: Install dependencies
         run: yarn
