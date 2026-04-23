@@ -1,6 +1,5 @@
 import * as fsPromises from "fs/promises";
 import copy from "rollup-plugin-copy";
-import scss from "rollup-plugin-scss";
 import { defineConfig, Plugin } from "vite";
 
 const moduleVersion = process.env.MODULE_VERSION;
@@ -11,23 +10,17 @@ console.log(process.env.VSCODE_INJECTION);
 
 export default defineConfig({
   build: {
+    outDir: "dist",
     sourcemap: true,
-    rollupOptions: {
-      input: "src/ts/module.ts",
-      output: {
-        dir: "dist",
-        entryFileNames: "scripts/module.js",
-        format: "es",
-      },
+    lib: {
+      entry: "src/ts/module.ts",
+      formats: ["es"],
+      fileName: () => "scripts/module.js",
+      cssFileName: "style",
     },
   },
   plugins: [
     updateModuleManifestPlugin(),
-    scss({
-      output: "dist/style.css",
-      sourceMap: true,
-      watch: ["src/styles/*.scss"],
-    }),
     copy({
       targets: [
         { src: "src/languages", dest: "dist" },
