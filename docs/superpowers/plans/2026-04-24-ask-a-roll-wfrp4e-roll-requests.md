@@ -425,12 +425,12 @@ Settings/localization strategy:
 
 **Tasks:**
 
-- [ ] Add `vitest` as a dev dependency and add scripts `test` and `test:run` to `package.json`.
-- [ ] Write failing tests in `src/ts/domain/requests.test.ts` for rejecting an empty actor list, rejecting an empty roll list, and creating a request with `status: "created"`.
-- [ ] Implement branded ids, WFRP4e roll descriptors, recipient targets, and `createRollRequest`.
-- [ ] Run `yarn test:run src/ts/domain/requests.test.ts` and verify all domain tests pass.
-- [ ] Run `yarn build` and verify TypeScript strict mode passes.
-- [ ] Commit with `git add package.json yarn.lock src/ts/domain && git commit -m "feat: add roll request domain model"`.
+- [x] Add `vitest` as a dev dependency and add scripts `test` and `test:run` to `package.json`.
+- [x] Write failing tests in `src/ts/domain/requests.test.ts` for rejecting an empty actor list, rejecting an empty roll list, and creating a request with `status: "created"`.
+- [x] Implement branded ids, WFRP4e roll descriptors, recipient targets, and `createRollRequest`.
+- [x] Run `yarn test:run src/ts/domain/requests.test.ts` and verify all domain tests pass.
+- [x] Run `yarn build` and verify TypeScript strict mode passes.
+- [x] Commit with `git add package.json yarn.lock src/ts/domain && git commit -m "feat: add roll request domain model"`. Skipped because no commit was requested.
 
 Minimal domain test content:
 

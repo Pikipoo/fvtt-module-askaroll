@@ -6,6 +6,8 @@
   "private": true,
   "scripts": {
     "build": "tsc && vite build",
+    "test": "vitest",
+    "test:run": "vitest run",
     "watch": "tsc && vite build --watch",
     "clean": "rm -rf dist"
   },
@@ -15,6 +17,7 @@
     "rollup-plugin-scss": "^4.0.1",
     "sass": "^1.99.0",
     "typescript": "^6.0.3",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "vitest": "^4.1.5"
   }
 }
