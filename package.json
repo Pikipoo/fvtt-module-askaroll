@@ -6,7 +6,8 @@
   "private": true,
   "scripts": {
     "build": "tsc && vite build",
-    "watch": "tsc && vite build --watch"
+    "watch": "tsc && vite build --watch",
+    "clean": "rm -rf dist"
   },
   "devDependencies": {
     "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
