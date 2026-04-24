@@ -20,4 +20,3 @@ If you have just created a new project with this template there are a few change
 [2]: https://www.typescriptlang.org/
 [3]: https://dog.ceo/dog-api/
 [4]: https://bringingfire.com/blog/intro-to-foundry-module-development
-5
