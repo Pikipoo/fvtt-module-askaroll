@@ -4,13 +4,13 @@
   "title": "Ask A Roll",
   "description": "Ask your players to make rolls for you.",
   "version": "0.0.1",
+  "author": "Pikipoo",
   "authors": [
     {
       "name": "Pikipoo",
       "url": "https://github.com/pikipoo"
     }
   ],
-  "packs": [],
   "system": ["wfrp4e"],
   "relationships": [
     {
@@ -22,7 +22,7 @@
       }
     }
   ],
-  "scripts": [],
+  "minimumCoreVersion": "13",
   "compatibility": {
     "minimum": "13",
     "verified": "13",
