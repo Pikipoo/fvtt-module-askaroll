@@ -1,6 +1,8 @@
 {
-  "askaroll.dog-browser": "Dog browser",
-  "askaroll.dogs": "Dogs",
-  "askaroll.fetch-random-dog": "Fetch random dog photo",
-  "askaroll.random-dog-alt": "Image of a random dog"
+  "askaroll.controls.requestRoll.name": "Ask for a Roll",
+  "askaroll.notifications.requestPlaceholder": "Ask A Roll request UI is not implemented yet.",
+  "askaroll.settings.deselectTokensOnOpen.name": "Deselect Tokens on Open",
+  "askaroll.settings.deselectTokensOnOpen.hint": "Deselect controlled tokens after opening the future roll request window.",
+  "askaroll.settings.useTokenImageForActors.name": "Use Token Images for Actors",
+  "askaroll.settings.useTokenImageForActors.hint": "Prefer selected token artwork over actor portraits when showing actor choices."
 }

@@ -519,14 +519,14 @@ describe("createRollRequest", () => {
 
 **Tasks:**
 
-- [ ] Write failing tests for pure setting key constants if test framework was added in Phase 1.
-- [ ] Keep the `import "../styles/style.scss";` side-effect import in `src/ts/module.ts`.
-- [ ] Replace DogBrowser initialization with `Hooks.once("init", registerAskARollInit)` and `Hooks.once("ready", registerAskARollReady)`.
-- [ ] Register settings `useTokenImageForActors` and `deselectTokensOnOpen` under namespace `askaroll`.
-- [ ] Add a token scene-control button through `Hooks.on("getSceneControlButtons", controls => { ... })` using the v13 hook signature inspected at `hookEvents.getSceneControlButtons`.
-- [ ] Remove dog browser template, class, and module API field.
-- [ ] Run `yarn build`.
-- [ ] Commit with `git add src/ts src/templates src/languages package.json yarn.lock && git commit -m "feat: wire ask a roll lifecycle"`.
+- [x] Write failing tests for pure setting key constants if test framework was added in Phase 1.
+- [x] Keep the `import "../styles/style.scss";` side-effect import in `src/ts/module.ts`.
+- [x] Replace DogBrowser initialization with `Hooks.once("init", registerAskARollInit)` and `Hooks.once("ready", registerAskARollReady)`.
+- [x] Register settings `useTokenImageForActors` and `deselectTokensOnOpen` under namespace `askaroll`.
+- [x] Add a token scene-control button through `Hooks.on("getSceneControlButtons", controls => { ... })` using the v13 hook signature inspected at `hookEvents.getSceneControlButtons`.
+- [x] Remove dog browser template, class, and module API field.
+- [x] Run `yarn build`.
+- [x] Commit with `git add src/ts src/templates src/languages package.json yarn.lock && git commit -m "feat: wire ask a roll lifecycle"`.
 
 Entry point target shape:
 
