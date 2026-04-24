@@ -4,29 +4,30 @@
   "title": "Ask A Roll",
   "description": "Ask your players to make rolls for you.",
   "version": "0.0.1",
-  "author": "Pikipoo",
   "authors": [
     {
       "name": "Pikipoo",
       "url": "https://github.com/pikipoo"
     }
   ],
-  "system": ["wfrp4e"],
-  "relationships": [
-    {
-      "id": "wfrp4e",
-      "type": "system",
-      "manifest": "https://github.com/moo-man/WFRP4e-FoundryVTT/releases/latest/download/system.json",
-      "compatibility": {
-        "verified": "13"
-      }
-    }
-  ],
-  "minimumCoreVersion": "13",
+  "url": "https://github.com/Pikipoo/fvtt-module-askaroll",
+  "manifest": "https://github.com/Pikipoo/fvtt-module-askaroll/releases/latest/download/module.json",
+  "bugs": "https://github.com/Pikipoo/fvtt-module-askaroll/issues",
+  "changelog": "https://github.com/Pikipoo/fvtt-module-askaroll/blob/main/CHANGELOG.md",
+  "license": "https://github.com/Pikipoo/fvtt-module-askaroll/blob/main/LICENSE",
   "compatibility": {
     "minimum": "13",
     "verified": "13",
     "maximum": "13"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "wfrp4e",
+        "type": "system",
+        "manifest": "https://github.com/moo-man/WFRP4e-FoundryVTT/releases/latest/download/system.json"
+      }
+    ]
   },
   "languages": [
     {
