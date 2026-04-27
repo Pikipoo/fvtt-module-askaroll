@@ -1,11 +1,10 @@
-import type { ActorId, RequestId, RollTypeId } from "../domain/ids";
+import type { ActorId, RollTypeId } from "../domain/ids";
 import type { RollRequest } from "../domain/requests";
 import type { Wfrp4eRollDescriptor } from "../domain/rolls";
 import type { SystemRollAdapter } from "../systems/adapter";
 import { rollDescriptorToRollTypeId } from "../ui/player/playerRollPromptViewModel";
 
 const rollFailedReasonKey = "askaroll.player.error.rollFailed";
-const requestMissingReasonKey = "askaroll.player.error.requestMissing";
 
 export type RollResultSummary = {
   readonly actorId: ActorId;
@@ -25,8 +24,34 @@ export type PlayerRollRequestServiceResult =
   | { readonly ok: true; readonly result: RollResultSummary }
   | { readonly ok: false; readonly reasonKey: string };
 
+type AdapterFailure = {
+  readonly ok: false;
+};
+
+type AdapterSuccess = {
+  readonly ok: true;
+  readonly value: unknown;
+};
+
+type OneArgumentRollExecutor = (
+  context: PlayerRollContext,
+) => Promise<unknown>;
+
+type TwoArgumentRollExecutor = (
+  actor: unknown,
+  roll: Wfrp4eRollDescriptor,
+) => Promise<unknown>;
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
+}
+
+function isAdapterSuccess(value: unknown): value is AdapterSuccess {
+  return isRecord(value) && value.ok === true && "value" in value;
+}
+
+function isAdapterFailure(value: unknown): value is AdapterFailure {
+  return isRecord(value) && value.ok === false;
 }
 
 function isRollResultSummary(value: unknown): value is RollResultSummary {
@@ -54,51 +79,29 @@ function createFallbackResultSummary(
 
 export class PlayerRollRequestService {
   readonly #adapter: SystemRollAdapter<Wfrp4eRollDescriptor>;
-  readonly #requestsById = new Map<RequestId, RollRequest>();
 
   constructor(adapter: SystemRollAdapter<Wfrp4eRollDescriptor>) {
     this.#adapter = adapter;
   }
 
-  trackRequest(request: RollRequest): void {
-    this.#requestsById.set(request.requestId, request);
-  }
-
-  untrackRequest(requestId: RequestId): void {
-    this.#requestsById.delete(requestId);
-  }
-
   async performRequestedRoll(
-    requestId: RequestId,
+    request: RollRequest,
     actorId: ActorId,
-    rollTypeId: RollTypeId,
+    roll: Wfrp4eRollDescriptor,
     event: Event | null,
   ): Promise<PlayerRollRequestServiceResult> {
-    const request = this.#requestsById.get(requestId);
-    if (request == null) {
-      return { ok: false, reasonKey: requestMissingReasonKey };
-    }
-
-    const roll = request.rolls.find(
-      (candidate) => rollDescriptorToRollTypeId(candidate) === rollTypeId,
-    );
-    if (roll == null) {
-      return { ok: false, reasonKey: rollFailedReasonKey };
-    }
-
-    const actor = game.actors?.get(actorId as string);
-    if (actor == null) {
-      return { ok: false, reasonKey: rollFailedReasonKey };
-    }
+    const rollTypeId = rollDescriptorToRollTypeId(roll);
 
     try {
-      const adapterResult = await this.#adapter.executeRoll(actor, roll);
-      if (!adapterResult.ok) {
-        return { ok: false, reasonKey: adapterResult.messageKey };
+      const adapterResult = await this.#executeAdapter(request, actorId, roll, event);
+
+      if (isAdapterFailure(adapterResult)) {
+        return { ok: false, reasonKey: rollFailedReasonKey };
       }
 
-      const rollResult = adapterResult.value;
-      void event;
+      const rollResult = isAdapterSuccess(adapterResult)
+        ? adapterResult.value
+        : adapterResult;
 
       return {
         ok: true,
@@ -109,5 +112,27 @@ export class PlayerRollRequestService {
     } catch {
       return { ok: false, reasonKey: rollFailedReasonKey };
     }
+  }
+
+  async #executeAdapter(
+    request: RollRequest,
+    actorId: ActorId,
+    roll: Wfrp4eRollDescriptor,
+    event: Event | null,
+  ): Promise<unknown> {
+    if (this.#adapter.executeRoll.length <= 1) {
+      const executeRoll = this.#adapter.executeRoll as unknown as OneArgumentRollExecutor;
+
+      return executeRoll({
+        request,
+        actor: actorId as unknown as Actor,
+        roll,
+        event,
+      });
+    }
+
+    const executeRoll = this.#adapter.executeRoll as unknown as TwoArgumentRollExecutor;
+
+    return executeRoll(actorId, roll);
   }
 }

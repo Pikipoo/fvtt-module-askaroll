@@ -1,6 +1,7 @@
 import type { ActorId, RollTypeId } from "../../domain/ids";
 import { asActorId, asRollTypeId } from "../../domain/ids";
 import type { RollRequest } from "../../domain/requests";
+import type { Wfrp4eRollDescriptor } from "../../domain/rolls";
 import type { PlayerRollRequestService } from "../../services/playerRollRequestService";
 import {
   buildPlayerRollPromptViewModel,
@@ -55,7 +56,6 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
     this.#request = request;
     this.#ownedActors = ownedActors;
     this.#service = service;
-    this.#service.trackRequest(request);
   }
 
   override async _prepareContext(
@@ -94,10 +94,19 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
       return;
     }
 
+    const roll = this.#findRoll(rollTypeId);
+
+    if (roll == null) {
+      ui.notifications?.error(
+        game.i18n!.localize("askaroll.player.error.rollFailed"),
+      );
+      return;
+    }
+
     const result = await this.#service.performRequestedRoll(
-      this.#request.requestId,
+      this.#request,
       actorId,
-      rollTypeId,
+      roll,
       event,
     );
 
@@ -134,6 +143,14 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
       img: actor.img,
       completedRollTypeIds,
     };
+  }
+
+  #findRoll(rollTypeId: RollTypeId): Wfrp4eRollDescriptor | null {
+    return (
+      this.#request.rolls.find(
+        (roll) => rollDescriptorToRollTypeId(roll) === rollTypeId,
+      ) ?? null
+    );
   }
 
   #isCompleted(actorId: ActorId, rollTypeId: RollTypeId): boolean {
