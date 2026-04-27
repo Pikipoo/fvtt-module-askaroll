@@ -1,8 +1,10 @@
 import type { ActorId } from "../../domain/ids";
-import { asActorId, asRequestId, asSceneId, asTokenId, asUserId } from "../../domain/ids";
+import { asActorId, asSceneId, asTokenId, asUserId } from "../../domain/ids";
 import type { RecipientTargetInput } from "../../domain/recipients";
-import { createRollRequest } from "../../domain/requests";
+import { gmRollRequestService } from "../../services/gmRollRequestService";
 import type { RollVisibility, SelectionMode } from "../../domain/requests";
+import { routeSocketMessage } from "../../socket/routers";
+import { createRequestCreateMessage } from "../../socket/messages";
 import type { Wfrp4eRollDescriptor } from "../../domain/rolls";
 import { getSystemRollAdapter } from "../../systems/registry";
 import {
@@ -176,28 +178,20 @@ export class GmRollRequestApp extends HandlebarsApplicationMixin(
     const recipientMode = data.recipientMode as string;
     const recipients = buildRecipientTarget(recipientMode, actorIds);
 
-    const result = createRollRequest({
-      requestId: asRequestId(foundry.utils.randomID()),
-      gmUserId: asUserId(game.user!.id),
+    const request = await gmRollRequestService.createAndDispatchRequest({
       actorIds,
       rolls,
       recipients,
       visibility: data.visibility as RollVisibility,
       selectionMode: data.selectionMode as SelectionMode,
       reason: (data.reason as string) ?? "",
-      createdAt: Date.now(),
     });
 
-    if (!result.ok) {
-      const key =
-        result.reason === "noActors"
-          ? "askaroll.gm.validation.noActors"
-          : "askaroll.gm.validation.noRolls";
-      ui.notifications?.warn(game.i18n!.localize(key));
+    if (request == null) {
       return;
     }
 
-    // Phase 4 stops here - no socket dispatch yet
+    routeSocketMessage(createRequestCreateMessage(request));
     this.close();
   }
 

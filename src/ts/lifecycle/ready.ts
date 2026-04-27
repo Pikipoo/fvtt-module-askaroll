@@ -1,4 +1,6 @@
 import { GmRollRequestApp } from "../ui/gm/GmRollRequestApp";
+import { askARollSocketChannel } from "../socket/channel";
+import { routeSocketMessage } from "../socket/routers";
 
 const requestRollToolName = "askaroll-request-roll";
 let gmRequestApp: GmRollRequestApp | null = null;
@@ -9,6 +11,7 @@ type SceneControlButtons = Record<
 >;
 
 export function registerAskARollReady(): void {
+  game.socket?.on(askARollSocketChannel, routeSocketMessage);
   Hooks.on("getSceneControlButtons", registerAskARollSceneControlButton);
 }
 

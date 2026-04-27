@@ -746,17 +746,19 @@ describe("shouldClosePrompt", () => {
 
 **Tasks:**
 
-- [ ] Write failing tests for socket guard acceptance and rejection paths.
-- [ ] Implement message constructors for `request:create`, `request:cancel`, `request:delivered`, `roll:submitted`, and `roll:failed`.
-- [ ] Implement `isAskARollSocketMessage(value: unknown)` and payload-specific guards.
-- [ ] Register `game.socket?.on("module.askaroll", routeSocketMessage)` during `ready`.
-- [ ] Implement GM router that accepts player result messages and rejects request creation from non-GM senders.
-- [ ] Implement player router that accepts only GM-created request messages targeting the current user.
-- [ ] Implement recipient resolver for controlled tokens, assigned characters, and users.
-- [ ] Implement chat result service that sets `flags.askaroll.requestId`, `flags.askaroll.rollTypeId`, `flags.askaroll.actorId`, `flags.askaroll.gmUserId`, `flags.askaroll.playerUserId`, and `flags.askaroll.protocol`.
-- [ ] Run socket guard tests if tests exist.
-- [ ] Run `yarn build`.
-- [ ] Commit with `git add src/ts/socket src/ts/services src/ts/lifecycle/ready.ts src/languages/en.json && git commit -m "feat: add roll request socket lifecycle"`.
+- [x] Write and pass socket guard acceptance and rejection tests.
+- [x] Implement message constructors for `request:create`, `request:cancel`, `request:delivered`, `roll:submitted`, and `roll:failed`.
+- [x] Implement `isAskARollSocketMessage(value: unknown)` and payload-specific guards.
+- [x] Register `game.socket?.on("module.askaroll", routeSocketMessage)` during `ready`.
+- [x] Implement GM router that accepts player result messages and rejects request creation from non-GM senders.
+- [x] Implement player router that accepts only GM-created request messages targeting the current user.
+- [x] Implement recipient resolver for controlled tokens, assigned characters, and users.
+- [x] Implement chat result service that sets `flags.askaroll.requestId`, `flags.askaroll.rollTypeId`, `flags.askaroll.actorId`, `flags.askaroll.gmUserId`, `flags.askaroll.playerUserId`, and `flags.askaroll.protocol`.
+- [x] Route locally-created GM request and delivery messages so the active client tracks its own request state.
+- [x] Capture internally-created WFRP4e chat messages with a temporary `preCreateChatMessage` hook for result correlation.
+- [x] Run socket guard tests.
+- [x] Run `yarn build`.
+- [x] Commit with `git add src/ts/socket src/ts/services src/ts/lifecycle/ready.ts src/languages/en.json && git commit -m "feat: add roll request socket lifecycle"`.
 
 Socket guard test target:
 

@@ -1,8 +1,13 @@
 import type { ActorId, RequestId, RollTypeId } from "../../domain/ids";
-import { asActorId, asRollTypeId } from "../../domain/ids";
+import { asActorId, asRollTypeId, asUserId } from "../../domain/ids";
 import type { RollRequest } from "../../domain/requests";
 import type { Wfrp4eRollDescriptor } from "../../domain/rolls";
 import type { PlayerRollRequestService } from "../../services/playerRollRequestService";
+import { askARollSocketChannel } from "../../socket/channel";
+import {
+  createRollFailedMessage,
+  createRollSubmittedMessage,
+} from "../../socket/messages";
 import {
   buildPlayerRollPromptViewModel,
   rollDescriptorToRollTypeId,
@@ -25,6 +30,8 @@ export type PlayerRollPromptAppOwnedActor = {
   readonly name: string;
   readonly img: string;
 };
+
+type PlayerRollPromptCloseCallback = (requestId: RequestId) => void;
 
 export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
   ApplicationV2,
@@ -51,6 +58,7 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
   readonly #request: RollRequest;
   readonly #ownedActors: readonly PlayerRollPromptAppOwnedActor[];
   readonly #service: PlayerRollRequestService;
+  readonly #onClose: PlayerRollPromptCloseCallback | null;
   readonly #completedRollActions = new Set<string>();
   readonly #pendingRollActions = new Set<string>();
 
@@ -58,11 +66,13 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
     request: RollRequest,
     ownedActors: readonly PlayerRollPromptAppOwnedActor[],
     service: PlayerRollRequestService,
+    onClose: PlayerRollPromptCloseCallback | null = null,
   ) {
     super({ id: requestScopedPromptId(request.requestId) });
     this.#request = request;
     this.#ownedActors = ownedActors;
     this.#service = service;
+    this.#onClose = onClose;
     this.#service.registerRequest(request);
   }
 
@@ -84,6 +94,7 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
       return await super.close(options);
     } finally {
       this.#service.unregisterRequest(this.#request.requestId);
+      this.#onClose?.(this.#request.requestId);
     }
   }
 
@@ -115,6 +126,11 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
     const roll = this.#findRoll(rollTypeId);
 
     if (roll == null) {
+      this.#emitRollFailed(
+        actorId,
+        rollTypeId,
+        "askaroll.player.error.rollFailed",
+      );
       ui.notifications?.error(
         game.i18n!.localize("askaroll.player.error.rollFailed"),
       );
@@ -126,10 +142,12 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
     const result = await this.#performPendingRoll(actorId, rollTypeId, event);
 
     if (!result.ok) {
+      this.#emitRollFailed(actorId, rollTypeId, result.reasonKey);
       ui.notifications?.error(game.i18n!.localize(result.reasonKey));
       return;
     }
 
+    this.#emitRollSubmitted(result.result);
     this.#markCompleted(actorId, rollTypeId);
 
     const viewModel = buildPlayerRollPromptViewModel(
@@ -203,6 +221,55 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
     } finally {
       this.#clearPending(actorId, rollTypeId);
     }
+  }
+
+  #emitRollSubmitted(result: {
+    readonly actorId: ActorId;
+    readonly rollTypeId: RollTypeId;
+    readonly chatMessageIds: readonly string[];
+    readonly completedAt: number;
+  }): void {
+    const currentUserId = game.user?.id;
+    if (currentUserId == null) {
+      return;
+    }
+
+    game.socket?.emit(
+      askARollSocketChannel,
+      createRollSubmittedMessage({
+        requestId: this.#request.requestId,
+        senderUserId: asUserId(currentUserId),
+        actorId: result.actorId,
+        rollTypeId: result.rollTypeId,
+        playerUserId: asUserId(currentUserId),
+        chatMessageIds: result.chatMessageIds,
+        completedAt: result.completedAt,
+      }),
+    );
+  }
+
+  #emitRollFailed(
+    actorId: ActorId,
+    rollTypeId: RollTypeId,
+    reasonKey: string,
+  ): void {
+    const currentUserId = game.user?.id;
+    if (currentUserId == null) {
+      return;
+    }
+
+    game.socket?.emit(
+      askARollSocketChannel,
+      createRollFailedMessage({
+        requestId: this.#request.requestId,
+        senderUserId: asUserId(currentUserId),
+        actorId,
+        rollTypeId,
+        playerUserId: asUserId(currentUserId),
+        reasonKey,
+        failedAt: Date.now(),
+      }),
+    );
   }
 
   #completionKey(actorId: ActorId, rollTypeId: RollTypeId): string {

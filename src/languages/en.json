@@ -23,6 +23,8 @@
   "askaroll.gm.visibility.label": "Roll Visibility",
   "askaroll.gm.visibility.publicroll": "Public Roll",
   "askaroll.gm.visibility.selfroll": "Self Roll",
+  "askaroll.notifications.sent": "Roll request sent.",
+  "askaroll.request.cancelled": "Roll request cancelled.",
   "askaroll.player.chooseOne": "Roll one of the following.",
   "askaroll.player.error.invalidActor": "This actor is not part of the roll request.",
   "askaroll.player.error.rollFailed": "The roll could not be completed. Try again.",
