@@ -4,5 +4,20 @@
   "askaroll.settings.deselectTokensOnOpen.name": "Deselect Tokens on Open",
   "askaroll.settings.deselectTokensOnOpen.hint": "Deselect controlled tokens after opening the future roll request window.",
   "askaroll.settings.useTokenImageForActors.name": "Use Token Images for Actors",
-  "askaroll.settings.useTokenImageForActors.hint": "Prefer selected token artwork over actor portraits when showing actor choices."
+  "askaroll.settings.useTokenImageForActors.hint": "Prefer selected token artwork over actor portraits when showing actor choices.",
+  "askaroll.systems.unsupportedSystem": "This game system is not supported yet.",
+  "askaroll.wfrp4e.characteristics.ws": "Weapon Skill",
+  "askaroll.wfrp4e.characteristics.bs": "Ballistic Skill",
+  "askaroll.wfrp4e.characteristics.s": "Strength",
+  "askaroll.wfrp4e.characteristics.t": "Toughness",
+  "askaroll.wfrp4e.characteristics.i": "Initiative",
+  "askaroll.wfrp4e.characteristics.ag": "Agility",
+  "askaroll.wfrp4e.characteristics.dex": "Dexterity",
+  "askaroll.wfrp4e.characteristics.int": "Intelligence",
+  "askaroll.wfrp4e.characteristics.wp": "Willpower",
+  "askaroll.wfrp4e.characteristics.fel": "Fellowship",
+  "askaroll.wfrp4e.rollGroups.characteristics": "Characteristics",
+  "askaroll.wfrp4e.rolls.unsupportedActor": "This actor cannot make WFRP4e rolls.",
+  "askaroll.wfrp4e.rolls.unsupportedRoll": "This WFRP4e roll type is not supported yet.",
+  "askaroll.wfrp4e.rolls.unverifiedRollApi": "WFRP4e roll execution is not available yet."
 }

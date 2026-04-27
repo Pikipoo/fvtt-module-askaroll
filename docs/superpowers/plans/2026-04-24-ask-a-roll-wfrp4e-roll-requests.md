@@ -573,15 +573,15 @@ Hooks.once("ready", registerAskARollReady);
 **Tasks:**
 
 - [ ] Write failing tests for WFRP4e guard functions using minimal structural actor fixtures.
-- [ ] Implement `isWfrp4eSystemId`, `isWfrp4eActor`, and characteristic-data guards using `unknown` inputs.
-- [ ] Implement static characteristic roll descriptors for WS, BS, S, T, I, Ag, Dex, Int, WP, and Fel.
+- [x] Implement `isWfrp4eSystemId`, `isWfrp4eActor`, and characteristic-data guards using `unknown` inputs.
+- [x] Implement static characteristic roll descriptors for WS, BS, S, T, I, Ag, Dex, Int, WP, and Fel.
 - [ ] Implement skill descriptor discovery from actor data only after confirming the WFRP4e actor shape in a running WFRP4e world.
-- [ ] Implement `getSystemRollAdapter` so it returns the WFRP4e adapter for `game.system.id === "wfrp4e"` and a typed unsupported result otherwise.
-- [ ] Implement `executeRoll` for characteristic rolls after verifying the exact WFRP4e Actor method in manual Foundry testing.
+- [x] Implement `getSystemRollAdapter` so it returns the WFRP4e adapter for `game.system.id === "wfrp4e"` and a typed unsupported result otherwise.
+- [x] Implement `executeRoll` as a typed unsupported path until the exact WFRP4e Actor method is verified in manual Foundry testing.
 - [ ] Implement skill roll execution after characteristic execution passes manual testing.
-- [ ] Run `yarn test:run src/ts/systems/wfrp4e/guards.test.ts` if tests exist.
-- [ ] Run `yarn build`.
-- [ ] Commit with `git add src/ts/systems src/languages/en.json && git commit -m "feat: add wfrp4e roll adapter"`.
+- [x] Run `yarn test:run src/ts/systems/wfrp4e/guards.test.ts` if tests exist.
+- [x] Run `yarn build`.
+- [x] Commit with `git add src/ts/systems src/languages/en.json && git commit -m "feat: add wfrp4e roll adapter"`.
 
 Guard fixture test target:
 
