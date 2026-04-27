@@ -1,0 +1,41 @@
+<section class="ask-a-roll-player-prompt">
+  <h2 class="ask-a-roll-player-prompt__title">{{localize "askaroll.player.intro"}}</h2>
+
+  {{#if reason}}
+  <section class="ask-a-roll-player-prompt__section">
+    <h3 class="ask-a-roll-player-prompt__heading">{{localize "askaroll.player.reason"}}</h3>
+    <p class="ask-a-roll-player-prompt__reason">{{reason}}</p>
+  </section>
+  {{/if}}
+
+  {{#if isChooseOne}}
+  <p class="ask-a-roll-player-prompt__note">{{localize "askaroll.player.chooseOne"}}</p>
+  {{/if}}
+
+  <div class="ask-a-roll-player-prompt__actors">
+    {{#each actors as |actor|}}
+    <section class="ask-a-roll-player-prompt__actor">
+      <header class="ask-a-roll-player-prompt__actor-header">
+        <img class="ask-a-roll-player-prompt__actor-img" src="{{actor.img}}" alt="{{actor.name}}" />
+        <h3 class="ask-a-roll-player-prompt__actor-name">{{actor.name}}</h3>
+      </header>
+
+      <div class="ask-a-roll-player-prompt__rolls">
+        {{#each actor.rolls as |roll|}}
+        <button
+          type="button"
+          class="ask-a-roll-player-prompt__roll-button"
+          data-action="roll"
+          data-actor-id="{{actor.id}}"
+          data-roll-type-id="{{roll.rollTypeId}}"
+          {{#if roll.completed}}disabled{{/if}}
+        >
+          <span class="ask-a-roll-player-prompt__roll-prefix">{{localize "askaroll.player.roll"}}</span>
+          <span class="ask-a-roll-player-prompt__roll-label">{{roll.label}}</span>
+        </button>
+        {{/each}}
+      </div>
+    </section>
+    {{/each}}
+  </div>
+</section>
