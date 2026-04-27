@@ -1,10 +1,11 @@
-import type { ActorId, RollTypeId } from "../domain/ids";
+import type { ActorId, RequestId, RollTypeId } from "../domain/ids";
 import type { RollRequest } from "../domain/requests";
 import type { Wfrp4eRollDescriptor } from "../domain/rolls";
 import type { SystemRollAdapter } from "../systems/adapter";
 import { rollDescriptorToRollTypeId } from "../ui/player/playerRollPromptViewModel";
 
 const rollFailedReasonKey = "askaroll.player.error.rollFailed";
+const invalidActorReasonKey = "askaroll.player.error.invalidActor";
 
 export type RollResultSummary = {
   readonly actorId: ActorId;
@@ -26,21 +27,13 @@ export type PlayerRollRequestServiceResult =
 
 type AdapterFailure = {
   readonly ok: false;
+  readonly messageKey?: string;
 };
 
 type AdapterSuccess = {
   readonly ok: true;
   readonly value: unknown;
 };
-
-type OneArgumentRollExecutor = (
-  context: PlayerRollContext,
-) => Promise<unknown>;
-
-type TwoArgumentRollExecutor = (
-  actor: unknown,
-  roll: Wfrp4eRollDescriptor,
-) => Promise<unknown>;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -79,24 +72,53 @@ function createFallbackResultSummary(
 
 export class PlayerRollRequestService {
   readonly #adapter: SystemRollAdapter<Wfrp4eRollDescriptor>;
+  readonly #requests = new Map<RequestId, RollRequest>();
 
   constructor(adapter: SystemRollAdapter<Wfrp4eRollDescriptor>) {
     this.#adapter = adapter;
   }
 
+  registerRequest(request: RollRequest): void {
+    this.#requests.set(request.requestId, request);
+  }
+
+  unregisterRequest(requestId: RequestId): void {
+    this.#requests.delete(requestId);
+  }
+
   async performRequestedRoll(
-    request: RollRequest,
+    requestId: RequestId,
     actorId: ActorId,
-    roll: Wfrp4eRollDescriptor,
+    rollTypeId: RollTypeId,
     event: Event | null,
   ): Promise<PlayerRollRequestServiceResult> {
-    const rollTypeId = rollDescriptorToRollTypeId(roll);
+    const request = this.#requests.get(requestId);
+    const roll = request?.rolls.find(
+      (requestedRoll) => rollDescriptorToRollTypeId(requestedRoll) === rollTypeId,
+    );
+    const actorBelongsToRequest =
+      request?.actorIds.some((requestActorId) => requestActorId === actorId) ?? false;
+    const actor = game.actors?.get(actorId);
+
+    if (request == null || roll == null) {
+      return { ok: false, reasonKey: rollFailedReasonKey };
+    }
+
+    if (!actorBelongsToRequest || actor == null) {
+      return { ok: false, reasonKey: invalidActorReasonKey };
+    }
 
     try {
-      const adapterResult = await this.#executeAdapter(request, actorId, roll, event);
+      const adapterResult = await this.#adapter.executeRoll(actor, roll);
 
       if (isAdapterFailure(adapterResult)) {
-        return { ok: false, reasonKey: rollFailedReasonKey };
+        return {
+          ok: false,
+          reasonKey:
+            typeof adapterResult.messageKey === "string"
+              ? adapterResult.messageKey
+              : rollFailedReasonKey,
+        };
       }
 
       const rollResult = isAdapterSuccess(adapterResult)
@@ -110,29 +132,8 @@ export class PlayerRollRequestService {
           : createFallbackResultSummary(actorId, rollTypeId),
       };
     } catch {
+      void event;
       return { ok: false, reasonKey: rollFailedReasonKey };
     }
-  }
-
-  async #executeAdapter(
-    request: RollRequest,
-    actorId: ActorId,
-    roll: Wfrp4eRollDescriptor,
-    event: Event | null,
-  ): Promise<unknown> {
-    if (this.#adapter.executeRoll.length <= 1) {
-      const executeRoll = this.#adapter.executeRoll as unknown as OneArgumentRollExecutor;
-
-      return executeRoll({
-        request,
-        actor: actorId as unknown as Actor,
-        roll,
-        event,
-      });
-    }
-
-    const executeRoll = this.#adapter.executeRoll as unknown as TwoArgumentRollExecutor;
-
-    return executeRoll(actorId, roll);
   }
 }

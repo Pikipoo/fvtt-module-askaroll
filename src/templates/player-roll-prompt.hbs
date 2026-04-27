@@ -8,6 +8,11 @@
   </section>
   {{/if}}
 
+  <section class="ask-a-roll-player-prompt__section">
+    <h3 class="ask-a-roll-player-prompt__heading">{{localize "askaroll.player.visibility"}}</h3>
+    <p class="ask-a-roll-player-prompt__visibility">{{visibilityLabel}}</p>
+  </section>
+
   {{#if isChooseOne}}
   <p class="ask-a-roll-player-prompt__note">{{localize "askaroll.player.chooseOne"}}</p>
   {{/if}}
@@ -29,6 +34,7 @@
           data-actor-id="{{actor.id}}"
           data-roll-type-id="{{roll.rollTypeId}}"
           {{#if roll.completed}}disabled{{/if}}
+          aria-disabled="{{#if roll.completed}}true{{else}}false{{/if}}"
         >
           <span class="ask-a-roll-player-prompt__roll-prefix">{{localize "askaroll.player.roll"}}</span>
           <span class="ask-a-roll-player-prompt__roll-label">{{roll.label}}</span>

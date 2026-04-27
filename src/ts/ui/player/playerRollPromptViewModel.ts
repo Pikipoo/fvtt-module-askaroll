@@ -28,6 +28,7 @@ export type PlayerRollPromptViewModel = {
   readonly reason: string;
   readonly selectionMode: SelectionMode;
   readonly visibility: RollVisibility;
+  readonly visibilityLabel: string;
   readonly isChooseOne: boolean;
   readonly actors: readonly PlayerRollPromptActorViewModel[];
   readonly totalActions: number;
@@ -59,6 +60,10 @@ function rollDescriptorToLabel(roll: Wfrp4eRollDescriptor): string {
     case "skill":
       return roll.label;
   }
+}
+
+function rollVisibilityToLabelKey(visibility: RollVisibility): string {
+  return `askaroll.player.visibility.${visibility}`;
 }
 
 export function shouldClosePrompt(input: ShouldClosePromptInput): boolean {
@@ -106,6 +111,7 @@ export function buildPlayerRollPromptViewModel(
     reason: request.reason,
     selectionMode: request.selectionMode,
     visibility: request.visibility,
+    visibilityLabel: rollVisibilityToLabelKey(request.visibility),
     isChooseOne: request.selectionMode === "one",
     actors,
     totalActions,

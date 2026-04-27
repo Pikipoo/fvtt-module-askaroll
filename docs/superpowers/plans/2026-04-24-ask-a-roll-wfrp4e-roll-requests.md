@@ -685,17 +685,15 @@ describe("buildGmRollRequestViewModel", () => {
 
 **Tasks:**
 
-- [ ] Write failing tests for player prompt completion behavior for `selectionMode: "one"` and `selectionMode: "all"`.
+- [x] Write and pass player prompt completion tests for `selectionMode: "one"` and `selectionMode: "all"`.
 - [x] Implement a prompt view model that lists actors, reason, roll labels, visibility label, and completion state.
 - [x] Create `player-roll-prompt.hbs` with localized intro, reason, choose-one note, actor list, and roll buttons.
-- [x] Implement `PlayerRollPromptApp` with ApplicationV2 action handlers for roll buttons.
-- [x] Implement player service method `performRequestedRoll(requestId, actorId, rollTypeId, event)`.
-- [x] Disable completed buttons and close prompt according to selection mode.
+- [x] Implement `PlayerRollPromptApp` with ApplicationV2 action handlers for roll buttons, request-scoped app ids, and request cleanup on close.
+- [x] Implement player service method `performRequestedRoll(requestId, actorId, rollTypeId, event)` with request and actor validation.
+- [x] Disable completed buttons, block duplicate in-flight rolls, and close the prompt according to selection mode.
 - [x] Run view-model tests if tests exist.
 - [x] Run `yarn build`.
 - [x] Commit with `git add src/ts/ui/player src/templates/player-roll-prompt.hbs src/styles/style.scss src/languages/en.json src/ts/services/playerRollRequestService.ts && git commit -m "feat: add player roll prompt"`.
-
-Note: the commit step was attempted, but GPG signing required an interactive passphrase and was left uncommitted.
 
 Completion test target:
 

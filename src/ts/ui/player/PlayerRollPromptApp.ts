@@ -1,4 +1,4 @@
-import type { ActorId, RollTypeId } from "../../domain/ids";
+import type { ActorId, RequestId, RollTypeId } from "../../domain/ids";
 import { asActorId, asRollTypeId } from "../../domain/ids";
 import type { RollRequest } from "../../domain/requests";
 import type { Wfrp4eRollDescriptor } from "../../domain/rolls";
@@ -13,6 +13,12 @@ import {
 
 const { ApplicationV2, HandlebarsApplicationMixin } =
   foundry.applications.api;
+
+function requestScopedPromptId(requestId: RequestId): string {
+  const safeRequestId = requestId.replaceAll(/[^A-Za-z0-9_-]/g, "-");
+
+  return `ask-a-roll-player-prompt-${safeRequestId}`;
+}
 
 export type PlayerRollPromptAppOwnedActor = {
   readonly id: ActorId;
@@ -46,16 +52,18 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
   readonly #ownedActors: readonly PlayerRollPromptAppOwnedActor[];
   readonly #service: PlayerRollRequestService;
   readonly #completedRollActions = new Set<string>();
+  readonly #pendingRollActions = new Set<string>();
 
   constructor(
     request: RollRequest,
     ownedActors: readonly PlayerRollPromptAppOwnedActor[],
     service: PlayerRollRequestService,
   ) {
-    super();
+    super({ id: requestScopedPromptId(request.requestId) });
     this.#request = request;
     this.#ownedActors = ownedActors;
     this.#service = service;
+    this.#service.registerRequest(request);
   }
 
   override async _prepareContext(
@@ -67,6 +75,16 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
     );
 
     return this.#localizeViewModelLabels(viewModel);
+  }
+
+  override async close(
+    options?: Parameters<foundry.applications.api.ApplicationV2["close"]>[0],
+  ): Promise<this> {
+    try {
+      return await super.close(options);
+    } finally {
+      this.#service.unregisterRequest(this.#request.requestId);
+    }
   }
 
   static async rollAction(
@@ -90,7 +108,7 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
     rollTypeId: RollTypeId,
     event: Event | null,
   ): Promise<void> {
-    if (this.#isCompleted(actorId, rollTypeId)) {
+    if (this.#isCompleted(actorId, rollTypeId) || this.#isPending(actorId, rollTypeId)) {
       return;
     }
 
@@ -103,12 +121,9 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
       return;
     }
 
-    const result = await this.#service.performRequestedRoll(
-      this.#request,
-      actorId,
-      roll,
-      event,
-    );
+    this.#markPending(actorId, rollTypeId);
+
+    const result = await this.#performPendingRoll(actorId, rollTypeId, event);
 
     if (!result.ok) {
       ui.notifications?.error(game.i18n!.localize(result.reasonKey));
@@ -157,8 +172,37 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
     return this.#completedRollActions.has(this.#completionKey(actorId, rollTypeId));
   }
 
+  #isPending(actorId: ActorId, rollTypeId: RollTypeId): boolean {
+    return this.#pendingRollActions.has(this.#completionKey(actorId, rollTypeId));
+  }
+
   #markCompleted(actorId: ActorId, rollTypeId: RollTypeId): void {
     this.#completedRollActions.add(this.#completionKey(actorId, rollTypeId));
+  }
+
+  #markPending(actorId: ActorId, rollTypeId: RollTypeId): void {
+    this.#pendingRollActions.add(this.#completionKey(actorId, rollTypeId));
+  }
+
+  #clearPending(actorId: ActorId, rollTypeId: RollTypeId): void {
+    this.#pendingRollActions.delete(this.#completionKey(actorId, rollTypeId));
+  }
+
+  async #performPendingRoll(
+    actorId: ActorId,
+    rollTypeId: RollTypeId,
+    event: Event | null,
+  ): ReturnType<PlayerRollRequestService["performRequestedRoll"]> {
+    try {
+      return await this.#service.performRequestedRoll(
+        this.#request.requestId,
+        actorId,
+        rollTypeId,
+        event,
+      );
+    } finally {
+      this.#clearPending(actorId, rollTypeId);
+    }
   }
 
   #completionKey(actorId: ActorId, rollTypeId: RollTypeId): string {
@@ -170,6 +214,7 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
   ): PlayerRollPromptViewModel {
     return {
       ...viewModel,
+      visibilityLabel: game.i18n!.localize(viewModel.visibilityLabel),
       actors: viewModel.actors.map((actor) => ({
         ...actor,
         rolls: actor.rolls.map((roll) => ({
@@ -178,5 +223,9 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
         })),
       })),
     };
+  }
+
+  get requestId(): RequestId {
+    return this.#request.requestId;
   }
 }
