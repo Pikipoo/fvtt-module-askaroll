@@ -106,6 +106,10 @@
   margin: 0.25rem 0 0;
 }
 
+.ask-a-roll-player-prompt__visibility {
+  margin: 0.25rem 0 0;
+}
+
 .ask-a-roll-player-prompt__actors {
   display: flex;
   flex-direction: column;
@@ -148,4 +152,9 @@
   &:disabled {
     opacity: 0.55;
   }
+}
+
+.ask-a-roll-player-prompt__roll-status {
+  font-size: 0.75rem;
+  font-style: italic;
 }

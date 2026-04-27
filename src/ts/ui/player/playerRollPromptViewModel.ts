@@ -28,6 +28,7 @@ export type PlayerRollPromptViewModel = {
   readonly reason: string;
   readonly selectionMode: SelectionMode;
   readonly visibility: RollVisibility;
+  readonly visibilityLabelKey: string;
   readonly isChooseOne: boolean;
   readonly actors: readonly PlayerRollPromptActorViewModel[];
   readonly totalActions: number;
@@ -106,6 +107,7 @@ export function buildPlayerRollPromptViewModel(
     reason: request.reason,
     selectionMode: request.selectionMode,
     visibility: request.visibility,
+    visibilityLabelKey: `askaroll.gm.visibility.${request.visibility}`,
     isChooseOne: request.selectionMode === "one",
     actors,
     totalActions,

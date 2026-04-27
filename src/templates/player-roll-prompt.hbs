@@ -8,6 +8,11 @@
   </section>
   {{/if}}
 
+  <section class="ask-a-roll-player-prompt__section">
+    <h3 class="ask-a-roll-player-prompt__heading">{{localize "askaroll.player.visibility"}}</h3>
+    <p class="ask-a-roll-player-prompt__visibility">{{localize visibilityLabelKey}}</p>
+  </section>
+
   {{#if isChooseOne}}
   <p class="ask-a-roll-player-prompt__note">{{localize "askaroll.player.chooseOne"}}</p>
   {{/if}}
@@ -32,6 +37,9 @@
         >
           <span class="ask-a-roll-player-prompt__roll-prefix">{{localize "askaroll.player.roll"}}</span>
           <span class="ask-a-roll-player-prompt__roll-label">{{roll.label}}</span>
+          {{#if roll.completed}}
+          <span class="ask-a-roll-player-prompt__roll-status">{{localize "askaroll.player.completed"}}</span>
+          {{/if}}
         </button>
         {{/each}}
       </div>
