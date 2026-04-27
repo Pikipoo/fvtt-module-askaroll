@@ -626,15 +626,15 @@ describe("isWfrp4eActorSystemData", () => {
 
 **Tasks:**
 
-- [ ] Write failing tests for `buildGmRollRequestViewModel` using fake users, actors, selected token ids, and WFRP4e roll groups.
-- [ ] Implement the GM view model as a pure function with no Foundry globals.
-- [ ] Create `gm-roll-request.hbs` with localized labels for recipients, actors, roll groups, visibility, selection mode, reason, submit, and cancel.
-- [ ] Implement `GmRollRequestApp` using ApplicationV2 plus HandlebarsApplicationMixin.
-- [ ] Wire the scene-control button to render one GM request app instance.
-- [ ] Add SCSS classes for actor selection, roll group layout, and submit actions.
-- [ ] Run view-model tests if tests exist.
-- [ ] Run `yarn build`.
-- [ ] Commit with `git add src/ts/ui/gm src/templates/gm-roll-request.hbs src/styles/style.scss src/languages/en.json src/ts/lifecycle/ready.ts && git commit -m "feat: add gm roll request ui"`.
+- [x] Write failing tests for `buildGmRollRequestViewModel` using fake users, actors, selected token ids, and WFRP4e roll groups.
+- [x] Implement the GM view model as a pure function with no Foundry globals.
+- [x] Create `gm-roll-request.hbs` with localized labels for recipients, actors, roll groups, visibility, selection mode, reason, submit, and cancel.
+- [x] Implement `GmRollRequestApp` using ApplicationV2 plus HandlebarsApplicationMixin.
+- [x] Wire the scene-control button to render one GM request app instance.
+- [x] Add SCSS classes for actor selection, roll group layout, and submit actions.
+- [x] Run view-model tests if tests exist.
+- [x] Run `yarn build`.
+- [x] Commit with `git add src/ts/ui/gm src/templates/gm-roll-request.hbs src/styles/style.scss src/languages/en.json src/ts/lifecycle/ready.ts && git commit -m "feat: add gm roll request ui"`.
 
 View-model test target:
 

@@ -1,0 +1,70 @@
+<div class="askaroll-gm-request__section">
+  <label>{{localize "askaroll.gm.recipientMode.label"}}</label>
+  <select name="recipientMode">
+    <option value="controlledTokens">{{localize "askaroll.gm.recipientMode.controlledTokens"}}</option>
+    <option value="assignedCharacters">{{localize "askaroll.gm.recipientMode.assignedCharacters"}}</option>
+    <option value="users">{{localize "askaroll.gm.recipientMode.users"}}</option>
+  </select>
+</div>
+
+<div class="askaroll-gm-request__section">
+  <label>{{localize "askaroll.gm.actors.label"}}</label>
+  {{#if actors.length}}
+  <div class="askaroll-gm-request__actor-grid">
+    {{#each actors}}
+    <label class="askaroll-gm-request__actor">
+      <input type="checkbox" name="actorIds" value="{{this.id}}" {{#if this.selected}}checked{{/if}} />
+      <img src="{{this.image}}" alt="{{this.name}}" class="askaroll-gm-request__actor-img" />
+      <span class="askaroll-gm-request__actor-name">{{this.name}}</span>
+    </label>
+    {{/each}}
+  </div>
+  {{else}}
+  <p class="askaroll-gm-request__empty">{{localize "askaroll.gm.actors.empty"}}</p>
+  {{/if}}
+</div>
+
+<div class="askaroll-gm-request__section">
+  <label>{{localize "askaroll.gm.rolls.label"}}</label>
+  {{#each rollGroups}}
+  <fieldset class="askaroll-gm-request__roll-group">
+    <legend>{{localize this.labelKey}}</legend>
+    <div class="askaroll-gm-request__roll-list">
+      {{#each this.rolls}}
+      <label class="askaroll-gm-request__roll">
+        <input type="checkbox" name="rollIds" value="{{this.id}}" />
+        {{#if this.labelKey}}{{localize this.labelKey}}{{else}}{{this.label}}{{/if}}
+      </label>
+      {{/each}}
+    </div>
+  </fieldset>
+  {{/each}}
+</div>
+
+<div class="askaroll-gm-request__section">
+  <label>{{localize "askaroll.gm.visibility.label"}}</label>
+  <select name="visibility">
+    <option value="publicroll">{{localize "askaroll.gm.visibility.publicroll"}}</option>
+    <option value="gmroll">{{localize "askaroll.gm.visibility.gmroll"}}</option>
+    <option value="blindroll">{{localize "askaroll.gm.visibility.blindroll"}}</option>
+    <option value="selfroll">{{localize "askaroll.gm.visibility.selfroll"}}</option>
+  </select>
+</div>
+
+<div class="askaroll-gm-request__section">
+  <label>{{localize "askaroll.gm.selectionMode.label"}}</label>
+  <select name="selectionMode">
+    <option value="all">{{localize "askaroll.gm.selectionMode.all"}}</option>
+    <option value="one">{{localize "askaroll.gm.selectionMode.one"}}</option>
+  </select>
+</div>
+
+<div class="askaroll-gm-request__section">
+  <label>{{localize "askaroll.gm.reason.label"}}</label>
+  <input type="text" name="reason" placeholder="{{localize "askaroll.gm.reason.placeholder"}}" />
+</div>
+
+<div class="askaroll-gm-request__actions">
+  <button type="submit"><i class="fa-solid fa-paper-plane"></i> {{localize "askaroll.gm.submit"}}</button>
+  <button type="button" data-action="close"><i class="fa-solid fa-xmark"></i> {{localize "askaroll.gm.cancel"}}</button>
+</div>

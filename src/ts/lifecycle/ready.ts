@@ -1,4 +1,7 @@
+import { GmRollRequestApp } from "../ui/gm/GmRollRequestApp";
+
 const requestRollToolName = "askaroll-request-roll";
+let gmRequestApp: GmRollRequestApp | null = null;
 
 type SceneControlButtons = Record<
   string,
@@ -29,9 +32,10 @@ function registerAskARollSceneControlButton(
     button: true,
     visible: true,
     onChange: () => {
-      ui.notifications?.info(
-        game.i18n.localize("askaroll.notifications.requestPlaceholder")
-      );
+      if (!gmRequestApp) {
+        gmRequestApp = new GmRollRequestApp();
+      }
+      gmRequestApp.render(true);
     },
   };
 }
