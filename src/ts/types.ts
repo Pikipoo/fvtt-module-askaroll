@@ -1,5 +1,1 @@
-import DogBrowser from "./apps/dogBrowser";
-
-export interface askaroll extends foundry.packages.Module {
-  dogBrowser: DogBrowser;
-}
+export interface AskARollModule extends foundry.packages.Module {}
