@@ -6,6 +6,7 @@ import type { Wfrp4eRollDescriptor } from "../domain/rolls";
 import { askARollSocketChannel } from "../socket/channel";
 import { createRequestCreateMessage, type RollFailedPayload, type RollSubmittedPayload } from "../socket/messages";
 import { notifyInfo, notifyWarn } from "./notifications";
+import { filterActorsOwnedByUser } from "./recipientResolver";
 
 export type CreateGmRollRequestServiceInput = {
   readonly actorIds: readonly ActorId[];
@@ -38,6 +39,79 @@ type MutableGmRollRequestState = {
   results: StoredRollResult[];
 };
 
+function uniqueActorIds(actorIds: readonly ActorId[]): readonly ActorId[] {
+  return [...new Set(actorIds)];
+}
+
+function rollDescriptorToRollTypeIdString(roll: Wfrp4eRollDescriptor): string {
+  switch (roll.type) {
+    case "characteristic":
+      return `${roll.type}:${roll.characteristic}`;
+    case "skill":
+      return `${roll.type}:${roll.skillId}`;
+    case "customFormula":
+      return `${roll.type}:${roll.formula}`;
+  }
+}
+
+function requestContainsRollResult(
+  request: RollRequest,
+  actorId: ActorId,
+  rollTypeId: RollTypeId,
+): boolean {
+  return (
+    request.actorIds.some((requestActorId) => requestActorId === actorId) &&
+    request.rolls.some(
+      (roll) => rollDescriptorToRollTypeIdString(roll) === rollTypeId,
+    )
+  );
+}
+
+function normalizeRecipientTargets(
+  recipients: RecipientTargetInput,
+  actorIds: readonly ActorId[],
+): { readonly recipients: RecipientTargetInput; readonly actorIds: readonly ActorId[] } | null {
+  if (recipients.type === "controlledTokens") {
+    const recipientActorIds = new Set(recipients.actorIds);
+    const normalizedActorIds = uniqueActorIds(
+      actorIds.filter((actorId) => recipientActorIds.has(actorId)),
+    );
+    return normalizedActorIds.length === 0 || recipients.tokenIds.length === 0 || recipients.sceneId == null
+      ? null
+      : {
+          actorIds: normalizedActorIds,
+          recipients: {
+            ...recipients,
+            actorIds: normalizedActorIds,
+          },
+        };
+  }
+
+  const ownedActorIdsByUser = recipients.userIds.map((userId) => ({
+    userId,
+    actorIds: filterActorsOwnedByUser(userId, actorIds),
+  }));
+  const validUserTargets = ownedActorIdsByUser.filter(
+    (target) => target.actorIds.length > 0,
+  );
+  const normalizedActorIds = uniqueActorIds(
+    validUserTargets.flatMap((target) => target.actorIds),
+  );
+
+  if (validUserTargets.length === 0 || normalizedActorIds.length === 0) {
+    return null;
+  }
+
+  return {
+    actorIds: normalizedActorIds,
+    recipients: {
+      type: recipients.type,
+      userIds: validUserTargets.map((target) => target.userId),
+      actorIds: normalizedActorIds,
+    },
+  };
+}
+
 export class GmRollRequestService {
   readonly #requests = new Map<RequestId, MutableGmRollRequestState>();
 
@@ -48,12 +122,28 @@ export class GmRollRequestService {
       return null;
     }
 
+    if (input.actorIds.length === 0) {
+      notifyWarn("askaroll.gm.validation.noActors");
+      return null;
+    }
+
+    if (input.rolls.length === 0) {
+      notifyWarn("askaroll.gm.validation.noRolls");
+      return null;
+    }
+
+    const normalizedTargets = normalizeRecipientTargets(input.recipients, input.actorIds);
+    if (normalizedTargets == null) {
+      notifyWarn("askaroll.gm.validation.noValidRecipients");
+      return null;
+    }
+
     const result = createRollRequest({
       requestId: asRequestId(foundry.utils.randomID()),
       gmUserId: asUserId(game.user.id),
-      actorIds: input.actorIds,
+      actorIds: normalizedTargets.actorIds,
       rolls: input.rolls,
-      recipients: input.recipients,
+      recipients: normalizedTargets.recipients,
       visibility: input.visibility,
       selectionMode: input.selectionMode,
       reason: input.reason,
@@ -97,6 +187,10 @@ export class GmRollRequestService {
       return;
     }
 
+    if (!requestContainsRollResult(state.request, payload.actorId, payload.rollTypeId)) {
+      return;
+    }
+
     state.results.push({
       actorId: payload.actorId,
       rollTypeId: payload.rollTypeId,
@@ -110,6 +204,10 @@ export class GmRollRequestService {
   markFailed(requestId: RequestId, payload: RollFailedPayload): void {
     const state = this.#requests.get(requestId);
     if (state == null) {
+      return;
+    }
+
+    if (!requestContainsRollResult(state.request, payload.actorId, payload.rollTypeId)) {
       return;
     }
 

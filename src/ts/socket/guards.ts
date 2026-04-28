@@ -7,6 +7,7 @@ import { askARollSocketProtocol } from "./channel";
 import type {
   AskARollSocketMessage,
   AskARollSocketMessageType,
+  RequestCancelPayload,
   RequestCreatePayload,
   RequestDeliveredPayload,
   RollFailedPayload,
@@ -76,14 +77,6 @@ function isWfrp4eRollDescriptor(value: unknown): value is Wfrp4eRollDescriptor {
     );
   }
 
-  if (value.type === "skill") {
-    return typeof value.skillId === "string" && typeof value.label === "string";
-  }
-
-  if (value.type === "customFormula") {
-    return typeof value.formula === "string" && typeof value.labelKey === "string";
-  }
-
   return false;
 }
 
@@ -117,7 +110,9 @@ export function isRollRequest(value: unknown): value is RollRequest {
     typeof value.createdAt === "number" &&
     isRecipientTarget(value.recipients) &&
     isStringArray(value.actorIds) &&
+    value.actorIds.length > 0 &&
     Array.isArray(value.rolls) &&
+    value.rolls.length > 0 &&
     value.rolls.every(isWfrp4eRollDescriptor) &&
     isRollVisibility(value.visibility) &&
     isSelectionMode(value.selectionMode) &&
@@ -140,6 +135,10 @@ export function isRequestCreateMessage(
 
 export function isRequestCreatePayload(value: unknown): value is RequestCreatePayload {
   return isRecord(value) && isRollRequest(value.request);
+}
+
+export function isRequestCancelPayload(value: unknown): value is RequestCancelPayload {
+  return isRecord(value) && typeof value.reasonKey === "string";
 }
 
 export function isRequestDeliveredPayload(value: unknown): value is RequestDeliveredPayload {
@@ -173,16 +172,39 @@ export function isRollFailedPayload(value: unknown): value is RollFailedPayload 
 }
 
 export function isAskARollSocketMessage(value: unknown): value is AskARollSocketMessage {
-  return (
-    isRecord(value) &&
-    value.moduleId === moduleId &&
-    value.protocol === askARollSocketProtocol &&
-    isSocketMessageType(value.type) &&
-    typeof value.requestId === "string" &&
-    typeof value.senderUserId === "string" &&
-    typeof value.createdAt === "number" &&
-    isRecord(value.payload)
-  );
+  if (
+    !isRecord(value) ||
+    value.moduleId !== moduleId ||
+    value.protocol !== askARollSocketProtocol ||
+    !isSocketMessageType(value.type) ||
+    typeof value.requestId !== "string" ||
+    typeof value.senderUserId !== "string" ||
+    typeof value.createdAt !== "number"
+  ) {
+    return false;
+  }
+
+  switch (value.type) {
+    case "request:create":
+      return isRequestCreateMessage(value as AskARollSocketMessage);
+    case "request:cancel":
+      return isRequestCancelPayload(value.payload);
+    case "request:delivered":
+      return (
+        isRequestDeliveredPayload(value.payload) &&
+        value.payload.playerUserId === value.senderUserId
+      );
+    case "roll:submitted":
+      return (
+        isRollSubmittedPayload(value.payload) &&
+        value.payload.playerUserId === value.senderUserId
+      );
+    case "roll:failed":
+      return (
+        isRollFailedPayload(value.payload) &&
+        value.payload.playerUserId === value.senderUserId
+      );
+  }
 }
 
 export function asRequestIdFromMessage(value: string): RequestId {

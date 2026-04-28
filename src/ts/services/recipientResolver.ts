@@ -32,7 +32,7 @@ function actorCanBeUsedByCurrentUser(actor: Actor, currentUser: User): boolean {
   return probe.isOwner === true;
 }
 
-function actorCanBeUsedByUser(actor: Actor, user: User): boolean {
+export function actorCanBeUsedByUser(actor: Actor, user: User): boolean {
   if (user.isGM) {
     return true;
   }

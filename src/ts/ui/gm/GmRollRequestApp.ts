@@ -1,5 +1,5 @@
-import type { ActorId } from "../../domain/ids";
-import { asActorId, asSceneId, asTokenId, asUserId } from "../../domain/ids";
+import type { ActorId, UserId } from "../../domain/ids";
+import { asActorId, asUserId } from "../../domain/ids";
 import type { RecipientTargetInput } from "../../domain/recipients";
 import { gmRollRequestService } from "../../services/gmRollRequestService";
 import { notifyWarn } from "../../services/notifications";
@@ -8,6 +8,7 @@ import { routeSocketMessage } from "../../socket/routers";
 import { createRequestCreateMessage } from "../../socket/messages";
 import type { Wfrp4eRollDescriptor } from "../../domain/rolls";
 import { getSystemRollAdapter } from "../../systems/registry";
+import { buildRecipientTargetForMode } from "../../services/recipientResolver";
 import {
   askARollSettingKeys,
   askARollSettingsNamespace,
@@ -22,42 +23,49 @@ const { ApplicationV2, HandlebarsApplicationMixin } =
   foundry.applications.api;
 
 function normalizeToArray(value: unknown): string[] {
-  if (Array.isArray(value)) return value as string[];
+  if (Array.isArray(value)) return value.filter((item): item is string => typeof item === "string");
   if (typeof value === "string") return [value];
   return [];
 }
 
+const recipientModes = new Set(["controlledTokens", "assignedCharacters", "users"]);
+const rollVisibilities = new Set<RollVisibility>([
+  "publicroll",
+  "gmroll",
+  "blindroll",
+  "selfroll",
+]);
+const selectionModes = new Set<SelectionMode>(["all", "one"]);
+
+function isRecipientMode(value: unknown): value is "controlledTokens" | "assignedCharacters" | "users" {
+  return typeof value === "string" && recipientModes.has(value);
+}
+
+function isRollVisibility(value: unknown): value is RollVisibility {
+  return typeof value === "string" && rollVisibilities.has(value as RollVisibility);
+}
+
+function isSelectionMode(value: unknown): value is SelectionMode {
+  return typeof value === "string" && selectionModes.has(value as SelectionMode);
+}
+
+function normalizeSelectedUserIds(value: unknown): readonly UserId[] {
+  const selectedIds = new Set(normalizeToArray(value));
+  return (game.users?.contents ?? [])
+    .filter((user) => !user.isGM && selectedIds.has(user.id))
+    .map((user) => asUserId(user.id));
+}
+
 function buildRecipientTarget(
-  mode: string,
+  mode: "controlledTokens" | "assignedCharacters" | "users",
   actorIds: readonly ActorId[],
+  selectedUserIds: readonly UserId[],
 ): RecipientTargetInput {
-  switch (mode) {
-    case "controlledTokens": {
-      const tokenIds = (canvas?.tokens?.controlled ?? [])
-        .filter((token) => {
-          const aid = token.actor?.id;
-          return aid != null && actorIds.some((id) => id === aid);
-        })
-        .map((token) => asTokenId(token.id));
-      const sceneId = canvas?.scene ? asSceneId(canvas.scene.id) : null;
-      return { type: "controlledTokens", actorIds, tokenIds, sceneId };
-    }
-    case "assignedCharacters": {
-      const userIds = (game.users?.contents ?? [])
-        .filter((user) => {
-          const charId = user.character?.id;
-          return charId != null && actorIds.some((id) => id === charId);
-        })
-        .map((user) => asUserId(user.id));
-      return { type: "assignedCharacters", userIds, actorIds };
-    }
-    default: {
-      const userIds = (game.users?.contents ?? [])
-        .filter((user) => !user.isGM)
-        .map((user) => asUserId(user.id));
-      return { type: "users", userIds, actorIds };
-    }
+  if (mode === "users") {
+    return { type: "users", userIds: selectedUserIds, actorIds };
   }
+
+  return buildRecipientTargetForMode(mode, actorIds);
 }
 
 export class GmRollRequestApp extends HandlebarsApplicationMixin(
@@ -170,16 +178,26 @@ export class GmRollRequestApp extends HandlebarsApplicationMixin(
       .map((id) => this.#rollDescriptorMap.get(id))
       .filter((r): r is Wfrp4eRollDescriptor => r != null);
 
-    const recipientMode = data.recipientMode as string;
-    const recipients = buildRecipientTarget(recipientMode, actorIds);
+    const recipientMode = isRecipientMode(data.recipientMode)
+      ? data.recipientMode
+      : "controlledTokens";
+    const selectedUserIds = normalizeSelectedUserIds(data.userIds);
+    const recipients = buildRecipientTarget(recipientMode, actorIds, selectedUserIds);
+    const visibility = isRollVisibility(data.visibility)
+      ? data.visibility
+      : "publicroll";
+    const selectionMode = isSelectionMode(data.selectionMode)
+      ? data.selectionMode
+      : "all";
+    const reason = typeof data.reason === "string" ? data.reason : "";
 
     const request = await gmRollRequestService.createAndDispatchRequest({
       actorIds,
       rolls,
       recipients,
-      visibility: data.visibility as RollVisibility,
-      selectionMode: data.selectionMode as SelectionMode,
-      reason: (data.reason as string) ?? "",
+      visibility,
+      selectionMode,
+      reason,
     });
 
     if (request == null) {

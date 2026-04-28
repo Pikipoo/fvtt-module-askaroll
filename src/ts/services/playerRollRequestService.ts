@@ -5,9 +5,11 @@ import type { Wfrp4eRollDescriptor } from "../domain/rolls";
 import type { SystemRollAdapter } from "../systems/adapter";
 import { rollDescriptorToRollTypeId } from "../ui/player/playerRollPromptViewModel";
 import { createAskARollChatFlags } from "./chatResultService";
+import { filterActorsOwnedByUser } from "./recipientResolver";
 
 const rollFailedReasonKey = "askaroll.player.error.rollFailed";
 const invalidActorReasonKey = "askaroll.player.error.invalidActor";
+const actorPermissionDeniedReasonKey = "askaroll.player.error.actorPermissionDenied";
 
 export type RollResultSummary = {
   readonly actorId: ActorId;
@@ -120,6 +122,14 @@ export class PlayerRollRequestService {
 
     if (!actorBelongsToRequest || actor == null) {
       return { ok: false, reasonKey: invalidActorReasonKey };
+    }
+
+    const currentUserId = game.user?.id;
+    const userOwnedActorIds = currentUserId == null
+      ? []
+      : filterActorsOwnedByUser(asUserId(currentUserId), [actorId]);
+    if (userOwnedActorIds.length === 0) {
+      return { ok: false, reasonKey: actorPermissionDeniedReasonKey };
     }
 
     const capturedChatMessageIds = new Set<string>();
