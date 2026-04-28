@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [v0.1.0-rc.0] - 2026-04-28
+## [v0.1.0-rc.1] - 2026-04-28
 
 Ask A Roll has moved beyond the bootstrap stage and now supports a complete roll-request workflow inside Foundry VTT.
 
@@ -21,6 +21,7 @@ Ask A Roll has moved beyond the bootstrap stage and now supports a complete roll
 ### Fixed
 
 - Project cleanup and packaging adjustments needed for the new workflow.
+- Updated localization keys for player visibility.
 
 ## [v0.0.1] - 2026-04-23
 
