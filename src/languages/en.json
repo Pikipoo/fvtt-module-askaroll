@@ -37,7 +37,7 @@
   "askaroll.player.title": "Roll Request",
   "askaroll.player.intro": "Your GM requested a roll.",
   "askaroll.player.reason": "Reason",
-  "askaroll.player.visibility": "Visibility",
+  "askaroll.player.visibility.label": "Visibility",
   "askaroll.player.visibility.publicroll": "Public Roll",
   "askaroll.player.visibility.gmroll": "Private GM Roll",
   "askaroll.player.visibility.blindroll": "Blind Roll",
