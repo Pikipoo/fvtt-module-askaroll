@@ -1,6 +1,6 @@
 {
   "name": "askaroll",
-  "version": "0.1.1-rc.0",
+  "version": "0.1.0-rc.0",
   "description": "Ask your players to make rolls for you.",
   "license": "MIT",
   "private": true,
