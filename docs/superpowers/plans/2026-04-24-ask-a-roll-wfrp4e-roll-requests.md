@@ -877,7 +877,8 @@ Initial localization key set:
 **Tasks:**
 
 - [ ] Run `yarn test:run` if Vitest was added.
-- [ ] Run `yarn build`.
+- [x] Run `yarn test:run` if Vitest was added.
+- [x] Run `yarn build`.
 - [ ] In Foundry v13 with WFRP4e, enable Ask A Roll in a test world.
 - [ ] Log in as GM and a non-GM player in separate browser sessions.
 - [ ] Confirm the scene-control button appears for GM and not for player.
@@ -894,6 +895,7 @@ Initial localization key set:
 - [ ] Confirm `selectionMode: "all"` closes after all requested rolls complete.
 - [ ] Confirm non-GM socket request creation is ignored by router if simulated from console.
 - [ ] Confirm unsupported system state shows a localized warning and does not render WFRP4e-only roll options.
+- [x] Create `docs/manual-test-checklists/wfrp4e-roll-requests.md` with a persistent manual checklist.
 - [ ] Commit manual checklist if created with `git add docs/manual-test-checklists/wfrp4e-roll-requests.md && git commit -m "docs: add wfrp4e roll request checklist"`.
 
 **Acceptance criteria:**
@@ -919,13 +921,14 @@ Initial localization key set:
 **Tasks:**
 
 - [ ] Run `yarn build`.
-- [ ] Confirm `dist/scripts/module.js` exists.
-- [ ] Confirm `dist/style.css` exists, proving the `src/ts/module.ts` style side-effect import still works.
-- [ ] Confirm `dist/templates/gm-roll-request.hbs` and `dist/templates/player-roll-prompt.hbs` exist.
-- [ ] Confirm `dist/languages/en.json` exists.
-- [ ] Confirm generated `dist/module.json` contains id `askaroll`, compatibility v13, WFRP4e relationship, styles `style.css`, and esmodule `scripts/module.js`.
-- [ ] Do not hand-edit `dist/module.json`.
-- [ ] Commit only source changes if a source fix was needed.
+- [x] Run `yarn build`.
+- [x] Confirm `dist/scripts/module.js` exists.
+- [x] Confirm `dist/style.css` exists, proving the `src/ts/module.ts` style side-effect import still works.
+- [x] Confirm `dist/templates/gm-roll-request.hbs` and `dist/templates/player-roll-prompt.hbs` exist.
+- [x] Confirm `dist/languages/en.json` exists.
+- [x] Confirm generated `dist/module.json` contains id `askaroll`, compatibility v13, WFRP4e relationship, styles `style.css`, and esmodule `scripts/module.js`.
+- [x] Do not hand-edit `dist/module.json`.
+- [x] Commit only source changes if a source fix was needed.
 
 **Acceptance criteria:**
 
