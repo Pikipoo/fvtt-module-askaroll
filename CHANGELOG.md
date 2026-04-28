@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.1.0-rc.0] - 2026-04-28
+
+Ask A Roll has moved beyond the bootstrap stage and now supports a complete roll-request workflow inside Foundry VTT.
+
+### Added
+
+- A GM-facing interface for creating roll requests.
+- A player prompt for receiving and answering requests in Foundry.
+- WFRP4e support for resolving requests with the system's roll rules.
+- Socket-driven request delivery and localized in-game messaging.
+
+### Improved
+
+- Better recipient validation and error handling when sending requests.
+- Foundational request lifecycle wiring across the module.
+
+### Fixed
+
+- Project cleanup and packaging adjustments needed for the new workflow.
+
 ## [v0.0.1] - 2026-04-23
 
 First tagged release of Ask A Roll. This version establishes the module package, release pipeline, and an initial in-Foundry UI scaffold.
