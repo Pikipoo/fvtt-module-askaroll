@@ -808,15 +808,15 @@ describe("isAskARollSocketMessage", () => {
 
 **Tasks:**
 
-- [ ] Replace dog-browser localization keys with Ask A Roll keys.
-- [ ] Add localization keys for settings names and hints.
-- [ ] Add localization keys for GM app labels and validation warnings.
-- [ ] Add localization keys for player prompt labels, action buttons, completion notifications, and errors.
-- [ ] Add localization keys for WFRP4e characteristics.
-- [ ] Add localization keys for chat/result flavors.
-- [ ] Run a text search for hardcoded visible strings in `src/ts`, `src/templates`, and `src/styles`.
-- [ ] Run `yarn build`.
-- [ ] Commit with `git add src/languages/en.json src/ts/settings src/ts/services/notifications.ts src/templates && git commit -m "feat: localize roll request workflow"`.
+- [x] Replace dog-browser localization keys with Ask A Roll keys.
+- [x] Add localization keys for settings names and hints.
+- [x] Add localization keys for GM app labels and validation warnings.
+- [x] Add localization keys for player prompt labels, action buttons, completion notifications, and errors.
+- [x] Add localization keys for WFRP4e characteristics.
+- [x] Add localization keys for chat/result flavors.
+- [x] Run a text search for hardcoded visible strings in `src/ts`, `src/templates`, and `src/styles`.
+- [x] Run `yarn build`.
+- [x] Commit with `git add src/languages/en.json src/ts/settings src/ts/services/notifications.ts src/templates && git commit -m "feat: localize roll request workflow"` (not requested).
 
 Initial localization key set:
 

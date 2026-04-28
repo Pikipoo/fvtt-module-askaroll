@@ -2,6 +2,7 @@ import type { ActorId } from "../../domain/ids";
 import { asActorId, asSceneId, asTokenId, asUserId } from "../../domain/ids";
 import type { RecipientTargetInput } from "../../domain/recipients";
 import { gmRollRequestService } from "../../services/gmRollRequestService";
+import { notifyWarn } from "../../services/notifications";
 import type { RollVisibility, SelectionMode } from "../../domain/requests";
 import { routeSocketMessage } from "../../socket/routers";
 import { createRequestCreateMessage } from "../../socket/messages";
@@ -93,9 +94,7 @@ export class GmRollRequestApp extends HandlebarsApplicationMixin(
   ): Promise<GmRollRequestViewModel & foundry.applications.api.ApplicationV2.RenderContext> {
     const adapterResult = getSystemRollAdapter(game);
     if (!adapterResult.ok) {
-      ui.notifications?.warn(
-        game.i18n!.localize("askaroll.gm.validation.noAdapter"),
-      );
+      notifyWarn("askaroll.gm.validation.noAdapter");
       return { actors: [], recipients: [], rollGroups: [] };
     }
     const adapter = adapterResult.value;
@@ -117,7 +116,7 @@ export class GmRollRequestApp extends HandlebarsApplicationMixin(
       .filter((actor) => adapter.isSupportedActor(actor))
       .map((actor) => ({
         id: actor.id,
-        name: actor.name ?? "Unknown",
+        name: actor.name ?? game.i18n!.localize("askaroll.common.unknown"),
         img: actor.img ?? "",
         tokenImg:
           (actor.prototypeToken?.texture?.src as string | undefined) ?? null,
@@ -129,7 +128,7 @@ export class GmRollRequestApp extends HandlebarsApplicationMixin(
 
     const users = (game.users?.contents ?? []).map((user) => ({
       id: user.id,
-      name: user.name ?? "Unknown",
+      name: user.name ?? game.i18n!.localize("askaroll.common.unknown"),
       isGM: user.isGM,
     }));
 
@@ -159,15 +158,11 @@ export class GmRollRequestApp extends HandlebarsApplicationMixin(
     const rollIds = normalizeToArray(data.rollIds);
 
     if (actorIds.length === 0) {
-      ui.notifications?.warn(
-        game.i18n!.localize("askaroll.gm.validation.noActors"),
-      );
+      notifyWarn("askaroll.gm.validation.noActors");
       return;
     }
     if (rollIds.length === 0) {
-      ui.notifications?.warn(
-        game.i18n!.localize("askaroll.gm.validation.noRolls"),
-      );
+      notifyWarn("askaroll.gm.validation.noRolls");
       return;
     }
 

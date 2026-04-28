@@ -3,6 +3,7 @@ import { asActorId, asRollTypeId, asUserId } from "../../domain/ids";
 import type { RollRequest } from "../../domain/requests";
 import type { Wfrp4eRollDescriptor } from "../../domain/rolls";
 import type { PlayerRollRequestService } from "../../services/playerRollRequestService";
+import { notifyError, notifyInfo } from "../../services/notifications";
 import { askARollSocketChannel } from "../../socket/channel";
 import {
   createRollFailedMessage,
@@ -23,6 +24,10 @@ function requestScopedPromptId(requestId: RequestId): string {
   const safeRequestId = requestId.replaceAll(/[^A-Za-z0-9_-]/g, "-");
 
   return `ask-a-roll-player-prompt-${safeRequestId}`;
+}
+
+function localizeAskARollLabel(label: string): string {
+  return label.startsWith("askaroll.") ? game.i18n!.localize(label) : label;
 }
 
 export type PlayerRollPromptAppOwnedActor = {
@@ -131,9 +136,7 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
         rollTypeId,
         "askaroll.player.error.rollFailed",
       );
-      ui.notifications?.error(
-        game.i18n!.localize("askaroll.player.error.rollFailed"),
-      );
+      notifyError("askaroll.player.error.rollFailed");
       return;
     }
 
@@ -143,12 +146,13 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
 
     if (!result.ok) {
       this.#emitRollFailed(actorId, rollTypeId, result.reasonKey);
-      ui.notifications?.error(game.i18n!.localize(result.reasonKey));
+      notifyError(result.reasonKey);
       return;
     }
 
     this.#emitRollSubmitted(result.result);
     this.#markCompleted(actorId, rollTypeId);
+    notifyInfo("askaroll.player.completed");
 
     const viewModel = buildPlayerRollPromptViewModel(
       this.#request,
@@ -286,7 +290,7 @@ export class PlayerRollPromptApp extends HandlebarsApplicationMixin(
         ...actor,
         rolls: actor.rolls.map((roll) => ({
           ...roll,
-          label: game.i18n!.localize(roll.label),
+          label: localizeAskARollLabel(roll.label),
         })),
       })),
     };
