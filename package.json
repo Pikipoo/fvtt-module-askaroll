@@ -9,7 +9,6 @@
     "test": "vitest",
     "test:run": "vitest run",
     "watch": "tsc && vite build --watch",
-    "copy:dist": "node --env-file-if-exists=.env scripts/copy-dist.mjs",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
