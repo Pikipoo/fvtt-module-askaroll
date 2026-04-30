@@ -10,7 +10,7 @@
     "test:run": "vitest run",
     "watch": "tsc && vite build --watch",
     "clean": "rm -rf dist",
-    "deploy": "node --env-file-if-exists=.env -e \"const fs=require('node:fs'); const target=process.env.DEPLOY_DIST_PATH; if (!target) throw new Error('DEPLOY_DIST_PATH is required'); fs.cpSync('dist', target, { recursive: true, force: true });\""
+    "deploy": "node --env-file-if-exists=.env -e \"const fs=require('node:fs'); const childProcess=require('node:child_process'); const target=process.env.DEPLOY_DIST_PATH; if (!target) throw new Error('DEPLOY_DIST_PATH is required'); childProcess.execFileSync('rm', ['-rf', '-I', target], { stdio: 'inherit' }); fs.mkdirSync(target, { recursive: true }); fs.cpSync('dist', target, { recursive: true, force: true });\""
   },
   "devDependencies": {
     "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
