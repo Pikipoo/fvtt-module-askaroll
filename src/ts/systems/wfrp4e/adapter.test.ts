@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import type { Wfrp4eRollDescriptor } from "../../domain/rolls";
 import { wfrp4eRollAdapter } from "./adapter";
@@ -19,6 +19,9 @@ const wfrp4eActor = {
       fel: {},
     },
   },
+  setupCharacteristic: async () => ({
+    roll: async () => ({ success: true }),
+  }),
 };
 
 describe("wfrp4eRollAdapter", () => {
@@ -43,9 +46,30 @@ describe("wfrp4eRollAdapter", () => {
     ]);
   });
 
-  it("returns typed unsupported results instead of executing WFRP4e rolls", async () => {
+  it("executes WFRP4e characteristic rolls through the actor API", async () => {
+    const roll = vi.fn(async () => ({ success: true }));
+    const setupCharacteristic = vi.fn(async () => ({ roll }));
+    const actor = {
+      ...wfrp4eActor,
+      setupCharacteristic,
+    };
+
     const result = await wfrp4eRollAdapter.executeRoll(
-      wfrp4eActor,
+      actor,
+      wfrp4eCharacteristicRollDescriptors[0],
+      { rollMode: "gmroll" },
+    );
+
+    expect(setupCharacteristic).toHaveBeenCalledWith("ws", {
+      fields: { rollMode: "gmroll" },
+    });
+    expect(roll).toHaveBeenCalledWith();
+    expect(result).toEqual({ ok: true, value: { success: true } });
+  });
+
+  it("returns a localized API error when actor roll methods are unavailable", async () => {
+    const result = await wfrp4eRollAdapter.executeRoll(
+      { system: wfrp4eActor.system },
       wfrp4eCharacteristicRollDescriptors[0],
     );
 
@@ -53,7 +77,7 @@ describe("wfrp4eRollAdapter", () => {
       ok: false,
       outcome: "unsupported",
       reason: "unverifiedRollApi",
-      messageKey: "askaroll.wfrp4e.rolls.unverifiedRollApi",
+      messageKey: "askaroll.wfrp4e.rolls.rollApiUnavailable",
     });
   });
 

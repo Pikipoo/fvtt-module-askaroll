@@ -67,5 +67,6 @@
   "askaroll.wfrp4e.characteristics.fel": "Fellowship",
   "askaroll.wfrp4e.rolls.unsupportedActor": "This actor cannot make WFRP4e rolls.",
   "askaroll.wfrp4e.rolls.unsupportedRoll": "This WFRP4e roll type is not supported yet.",
-  "askaroll.wfrp4e.rolls.unverifiedRollApi": "WFRP4e roll execution is not available yet."
+  "askaroll.wfrp4e.rolls.rollApiUnavailable": "The WFRP4e actor roll API is unavailable for this actor.",
+  "askaroll.wfrp4e.rolls.rollFailed": "The WFRP4e roll could not be completed."
 }

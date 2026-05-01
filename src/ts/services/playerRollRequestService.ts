@@ -165,7 +165,9 @@ export class PlayerRollRequestService {
     );
 
     try {
-      const adapterResult = await this.#adapter.executeRoll(actor, roll);
+      const adapterResult = await this.#adapter.executeRoll(actor, roll, {
+        rollMode: request.visibility,
+      });
 
       if (isAdapterFailure(adapterResult)) {
         return {
