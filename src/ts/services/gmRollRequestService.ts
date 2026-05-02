@@ -7,6 +7,7 @@ import { askARollSocketChannel } from "../socket/channel";
 import { createRequestCreateMessage, type RollFailedPayload, type RollSubmittedPayload } from "../socket/messages";
 import { notifyInfo, notifyWarn } from "./notifications";
 import { filterActorsOwnedByUser } from "./recipientResolver";
+import { requestChatCardService } from "./requestChatCardService";
 
 export type CreateGmRollRequestServiceInput = {
   readonly actorIds: readonly ActorId[];
@@ -64,6 +65,28 @@ function requestContainsRollResult(
     request.rolls.some(
       (roll) => rollDescriptorToRollTypeIdString(roll) === rollTypeId,
     )
+  );
+}
+
+function resultMatches(
+  result: StoredRollResult,
+  actorId: ActorId,
+  rollTypeId: RollTypeId,
+  playerUserId: UserId,
+): boolean {
+  return (
+    result.actorId === actorId &&
+    result.rollTypeId === rollTypeId &&
+    result.playerUserId === playerUserId
+  );
+}
+
+function hasCompletedSelectionForPlayer(
+  state: MutableGmRollRequestState,
+  playerUserId: UserId,
+): boolean {
+  return state.results.some(
+    (result) => result.status === "submitted" && result.playerUserId === playerUserId,
   );
 }
 
@@ -160,6 +183,7 @@ export class GmRollRequestService {
     }
 
     this.trackRequest(result.value);
+    await requestChatCardService.createRequestPrompt(result.value);
     game.socket?.emit(
       askARollSocketChannel,
       createRequestCreateMessage(result.value),
@@ -181,14 +205,29 @@ export class GmRollRequestService {
     this.#requests.get(requestId)?.deliveredToUserIds.add(playerUserId);
   }
 
-  markSubmitted(requestId: RequestId, payload: RollSubmittedPayload): void {
+  markSubmitted(requestId: RequestId, payload: RollSubmittedPayload): boolean {
     const state = this.#requests.get(requestId);
     if (state == null) {
-      return;
+      return false;
     }
 
     if (!requestContainsRollResult(state.request, payload.actorId, payload.rollTypeId)) {
-      return;
+      return false;
+    }
+
+    if (
+      state.results.some((result) =>
+        resultMatches(result, payload.actorId, payload.rollTypeId, payload.playerUserId),
+      )
+    ) {
+      return false;
+    }
+
+    if (
+      state.request.selectionMode === "one" &&
+      hasCompletedSelectionForPlayer(state, payload.playerUserId)
+    ) {
+      return false;
     }
 
     state.results.push({
@@ -199,6 +238,7 @@ export class GmRollRequestService {
       status: "submitted",
       completedAt: payload.completedAt,
     });
+    return true;
   }
 
   markFailed(requestId: RequestId, payload: RollFailedPayload): void {
@@ -208,6 +248,14 @@ export class GmRollRequestService {
     }
 
     if (!requestContainsRollResult(state.request, payload.actorId, payload.rollTypeId)) {
+      return;
+    }
+
+    if (
+      state.results.some((result) =>
+        resultMatches(result, payload.actorId, payload.rollTypeId, payload.playerUserId),
+      )
+    ) {
       return;
     }
 

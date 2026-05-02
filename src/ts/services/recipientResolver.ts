@@ -45,12 +45,6 @@ export function actorCanBeUsedByUser(actor: Actor, user: User): boolean {
   return false;
 }
 
-function hasCurrentUserControlledActor(actorId: ActorId): boolean {
-  return (canvas?.tokens?.controlled ?? []).some(
-    (token) => token.actor?.id === actorId,
-  );
-}
-
 export function buildRecipientTargetForMode(
   mode: string,
   actorIds: readonly ActorId[],
@@ -89,7 +83,7 @@ export function isRequestTargetingUser(
   userId: UserId,
 ): boolean {
   if (request.recipients.type === "controlledTokens") {
-    return request.recipients.actorIds.some(hasCurrentUserControlledActor);
+    return filterActorsOwnedByUser(userId, request.recipients.actorIds).length > 0;
   }
 
   return request.recipients.userIds.some((targetUserId) => targetUserId === userId);

@@ -28,6 +28,7 @@ function stubFoundryEnvironment(input: {
   readonly actors: readonly Actor[];
   readonly emit: ReturnType<typeof vi.fn>;
   readonly warn: ReturnType<typeof vi.fn>;
+  readonly chatCreate?: ReturnType<typeof vi.fn>;
 }): void {
   vi.stubGlobal("foundry", {
     utils: { randomID: () => "request-1" },
@@ -45,6 +46,7 @@ function stubFoundryEnvironment(input: {
     i18n: { localize: (key: string) => key },
   });
   vi.stubGlobal("ui", { notifications: { warn: input.warn, info: vi.fn() } });
+  vi.stubGlobal("ChatMessage", { create: input.chatCreate ?? vi.fn() });
 }
 
 describe("GmRollRequestService", () => {
@@ -150,11 +152,13 @@ describe("GmRollRequestService", () => {
   it("filters specific-user targets to actors owned by that user", async () => {
     const emit = vi.fn();
     const warn = vi.fn();
+    const chatCreate = vi.fn();
     stubFoundryEnvironment({
       users: [user("player-1")],
       actors: [actor("actor-1", ["player-1"]), actor("actor-2", [])],
       emit,
       warn,
+      chatCreate,
     });
 
     const service = new GmRollRequestService();
@@ -177,6 +181,7 @@ describe("GmRollRequestService", () => {
       recipients: { type: "users", userIds: ["player-1"], actorIds: ["actor-1"] },
     });
     expect(emit).toHaveBeenCalledOnce();
+    expect(chatCreate).toHaveBeenCalledOnce();
     expect(warn).not.toHaveBeenCalled();
   });
 
@@ -223,5 +228,96 @@ describe("GmRollRequestService", () => {
     });
 
     expect(service.getState(request.requestId)?.results).toEqual([]);
+  });
+
+  it("deduplicates submitted results for the same player actor and roll", async () => {
+    const emit = vi.fn();
+    const warn = vi.fn();
+    stubFoundryEnvironment({
+      users: [user("player-1")],
+      actors: [actor("actor-1", ["player-1"])],
+      emit,
+      warn,
+    });
+
+    const service = new GmRollRequestService();
+    const request = await service.createAndDispatchRequest({
+      actorIds: [asActorId("actor-1")],
+      rolls: [wpRoll],
+      recipients: {
+        type: "users",
+        userIds: [asUserId("player-1")],
+        actorIds: [asActorId("actor-1")],
+      },
+      visibility: "publicroll",
+      selectionMode: "all",
+      reason: "Fear test",
+    });
+
+    expect(request).not.toBeNull();
+    if (request == null) return;
+
+    const submitted = {
+      actorId: asActorId("actor-1"),
+      rollTypeId: asRollTypeId("characteristic:wp"),
+      playerUserId: asUserId("player-1"),
+      chatMessageIds: [],
+      completedAt: 1,
+    };
+    service.markSubmitted(request.requestId, submitted);
+    service.markSubmitted(request.requestId, { ...submitted, completedAt: 2 });
+
+    expect(service.getState(request.requestId)?.results).toHaveLength(1);
+  });
+
+  it("allows only one submitted result per player for choose-one requests", async () => {
+    const emit = vi.fn();
+    const warn = vi.fn();
+    const felRoll: Wfrp4eRollDescriptor = {
+      system: "wfrp4e",
+      type: "characteristic",
+      characteristic: "fel",
+      labelKey: "askaroll.wfrp4e.characteristics.fel",
+    };
+    stubFoundryEnvironment({
+      users: [user("player-1")],
+      actors: [actor("actor-1", ["player-1"])],
+      emit,
+      warn,
+    });
+
+    const service = new GmRollRequestService();
+    const request = await service.createAndDispatchRequest({
+      actorIds: [asActorId("actor-1")],
+      rolls: [wpRoll, felRoll],
+      recipients: {
+        type: "users",
+        userIds: [asUserId("player-1")],
+        actorIds: [asActorId("actor-1")],
+      },
+      visibility: "publicroll",
+      selectionMode: "one",
+      reason: "Fear test",
+    });
+
+    expect(request).not.toBeNull();
+    if (request == null) return;
+
+    service.markSubmitted(request.requestId, {
+      actorId: asActorId("actor-1"),
+      rollTypeId: asRollTypeId("characteristic:wp"),
+      playerUserId: asUserId("player-1"),
+      chatMessageIds: [],
+      completedAt: 1,
+    });
+    service.markSubmitted(request.requestId, {
+      actorId: asActorId("actor-1"),
+      rollTypeId: asRollTypeId("characteristic:fel"),
+      playerUserId: asUserId("player-1"),
+      chatMessageIds: [],
+      completedAt: 2,
+    });
+
+    expect(service.getState(request.requestId)?.results).toHaveLength(1);
   });
 });

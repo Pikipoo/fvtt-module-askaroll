@@ -5,11 +5,12 @@ import type { Wfrp4eRollDescriptor } from "../domain/rolls";
 import type { SystemRollAdapter } from "../systems/adapter";
 import { rollDescriptorToRollTypeId } from "../ui/player/playerRollPromptViewModel";
 import { createAskARollChatFlags } from "./chatResultService";
-import { filterActorsOwnedByUser } from "./recipientResolver";
+import { filterActorsOwnedByUser, isRequestTargetingUser } from "./recipientResolver";
 
 const rollFailedReasonKey = "askaroll.player.error.rollFailed";
 const invalidActorReasonKey = "askaroll.player.error.invalidActor";
 const actorPermissionDeniedReasonKey = "askaroll.player.error.actorPermissionDenied";
+const userNotTargetedReasonKey = "askaroll.player.error.userNotTargeted";
 
 export type RollResultSummary = {
   readonly actorId: ActorId;
@@ -125,6 +126,10 @@ export class PlayerRollRequestService {
     }
 
     const currentUserId = game.user?.id;
+    if (currentUserId == null || !isRequestTargetingUser(request, asUserId(currentUserId))) {
+      return { ok: false, reasonKey: userNotTargetedReasonKey };
+    }
+
     const userOwnedActorIds = currentUserId == null
       ? []
       : filterActorsOwnedByUser(asUserId(currentUserId), [actorId]);
