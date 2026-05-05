@@ -190,18 +190,26 @@ export function buildRequestChatCardContent(request: RollRequest): string {
   const chooseOneNote = request.selectionMode === "one"
     ? `<p class="ask-a-roll-chat-request__note">${escapeHtml(game.i18n!.localize("askaroll.player.chooseOne"))}</p>`
     : "";
+  const actorImages = request.actorIds
+    .map((actorId) => {
+      const actor = getActorDisplay(actorId);
+      return actor.img.length > 0
+        ? `<img class="ask-a-roll-chat-request__actor-img" src="${escapeHtml(actor.img)}" alt="${escapeHtml(actor.name)}" />`
+        : "";
+    })
+    .join("");
+  const actorImageSection = actorImages
+    ? `<div class="ask-a-roll-chat-request__actor-images">${actorImages}</div>`
+    : "";
   const actorSections = request.actorIds
     .map((actorId) => {
       const actor = getActorDisplay(actorId);
-      const image = actor.img.length > 0
-        ? `<img class="ask-a-roll-chat-request__actor-img" src="${escapeHtml(actor.img)}" alt="${escapeHtml(actor.name)}" />`
-        : "";
 
-      return `<section class="ask-a-roll-chat-request__actor">${image}<h4 class="ask-a-roll-chat-request__actor-name">${escapeHtml(actor.name)}</h4><div class="ask-a-roll-chat-request__rolls">${buildRollButtons(request, actorId)}</div></section>`;
+      return `<section class="ask-a-roll-chat-request__actor"><h4 class="ask-a-roll-chat-request__actor-name">${escapeHtml(actor.name)}</h4><div class="ask-a-roll-chat-request__rolls">${buildRollButtons(request, actorId)}</div></section>`;
     })
     .join("");
 
-  return `<section class="ask-a-roll-chat-request" data-request-id="${escapeHtml(request.requestId)}"><h3>${escapeHtml(game.i18n!.localize("askaroll.player.intro"))}</h3>${reasonSection}<section class="ask-a-roll-chat-request__section"><h4>${escapeHtml(game.i18n!.localize("askaroll.player.visibility.label"))}</h4><p>${escapeHtml(game.i18n!.localize(`askaroll.player.visibility.${request.visibility}`))}</p></section>${chooseOneNote}<div class="ask-a-roll-chat-request__actors">${actorSections}</div></section>`;
+  return `<section class="ask-a-roll-chat-request" data-request-id="${escapeHtml(request.requestId)}"><h3>${escapeHtml(game.i18n!.localize("askaroll.player.intro"))}</h3>${actorImageSection}${reasonSection}<section class="ask-a-roll-chat-request__section"><h4>${escapeHtml(game.i18n!.localize("askaroll.player.visibility.label"))}</h4><p>${escapeHtml(game.i18n!.localize(`askaroll.player.visibility.${request.visibility}`))}</p></section>${chooseOneNote}<div class="ask-a-roll-chat-request__actors">${actorSections}</div></section>`;
 }
 
 export function createAskARollRequestChatFlags(
