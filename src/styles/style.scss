@@ -85,6 +85,13 @@
   padding-top: 0.5rem;
 }
 
+.ask-a-roll-chat-request__actor-img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
 .ask-a-roll-player-prompt {
   display: flex;
   flex-direction: column;
