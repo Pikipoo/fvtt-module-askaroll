@@ -85,6 +85,20 @@
   padding-top: 0.5rem;
 }
 
+.ask-a-roll-chat-request__character-names {
+  margin: 0 0 0.125rem;
+  font-weight: 600;
+  line-height: 1.2;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ask-a-roll-chat-request h3 {
+  margin-top: 0;
+}
+
 .ask-a-roll-chat-request__actor-images {
   display: flex;
   justify-content: center;

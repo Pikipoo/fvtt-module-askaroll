@@ -182,6 +182,35 @@ function buildRollButtons(request: RollRequest, actorId: ActorId): string {
     .join("");
 }
 
+const actorNameMaxLength = 24;
+const actorNameListMaxLength = 80;
+
+function truncateReadableText(value: string, maxLength: number): string {
+  if (value.length <= maxLength) {
+    return value;
+  }
+
+  const ellipsis = "…";
+  const sliceLength = Math.max(0, maxLength - ellipsis.length);
+  const clipped = value.slice(0, sliceLength);
+  const lastWordBoundary = clipped.search(/\s+\S*$/);
+  const shouldUseWordBoundary = lastWordBoundary >= Math.floor(sliceLength * 0.6);
+  const readableClip = shouldUseWordBoundary
+    ? clipped.slice(0, lastWordBoundary)
+    : clipped;
+
+  return `${readableClip.trimEnd()}${ellipsis}`;
+}
+
+function buildActorNameList(actorIds: readonly ActorId[]): string {
+  const names = actorIds.map((actorId) => {
+    const name = getActorDisplay(actorId).name.trim();
+    return truncateReadableText(name, actorNameMaxLength);
+  });
+
+  return truncateReadableText(names.join(", "), actorNameListMaxLength);
+}
+
 export function buildRequestChatCardContent(request: RollRequest): string {
   const reason = request.reason.trim();
   const reasonSection = reason
@@ -206,13 +235,17 @@ export function buildRequestChatCardContent(request: RollRequest): string {
   const actorImageSection = actorImages
     ? `<div class="ask-a-roll-chat-request__actor-images">${actorImages}</div>`
     : "";
+  const actorNameList = buildActorNameList(request.actorIds);
+  const actorNameSection = actorNameList.length > 0
+    ? `<p class="ask-a-roll-chat-request__character-names" title="${escapeHtml(actorNameList)}">${escapeHtml(actorNameList)}</p>`
+    : "";
   const actorSections = request.actorIds
     .map(
       (actorId) => `<section class="ask-a-roll-chat-request__actor"><div class="ask-a-roll-chat-request__rolls">${buildRollButtons(request, actorId)}</div></section>`,
     )
     .join("");
 
-  return `<section class="ask-a-roll-chat-request" data-request-id="${escapeHtml(request.requestId)}"><h3>${escapeHtml(game.i18n!.localize("askaroll.player.intro"))}</h3>${actorImageSection}${reasonSection}${visibilitySection}${chooseOneNote}<div class="ask-a-roll-chat-request__actors">${actorSections}</div></section>`;
+  return `<section class="ask-a-roll-chat-request" data-request-id="${escapeHtml(request.requestId)}">${actorNameSection}<h3>${escapeHtml(game.i18n!.localize("askaroll.player.intro"))}</h3>${actorImageSection}${reasonSection}${visibilitySection}${chooseOneNote}<div class="ask-a-roll-chat-request__actors">${actorSections}</div></section>`;
 }
 
 export function createAskARollRequestChatFlags(
