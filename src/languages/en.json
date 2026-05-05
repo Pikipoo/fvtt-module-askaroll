@@ -35,7 +35,7 @@
   "askaroll.notifications.sent": "Roll request sent.",
   "askaroll.request.cancelled": "Roll request cancelled.",
   "askaroll.player.title": "Roll Request",
-  "askaroll.player.intro": "Your GM requested a roll.",
+  "askaroll.player.intro": "Your GM requested a roll",
   "askaroll.player.reason": "Reason",
   "askaroll.player.visibility.label": "Visibility",
   "askaroll.player.visibility.publicroll": "Public Roll",
