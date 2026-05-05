@@ -185,7 +185,7 @@ function buildRollButtons(request: RollRequest, actorId: ActorId): string {
 export function buildRequestChatCardContent(request: RollRequest): string {
   const reason = request.reason.trim();
   const reasonSection = reason
-    ? `<section class="ask-a-roll-chat-request__section"><h4>${escapeHtml(game.i18n!.localize("askaroll.player.reason"))}</h4><p>${escapeHtml(reason)}</p></section>`
+    ? `<section class="ask-a-roll-chat-request__section"><p><strong>Reason:</strong> <em>${escapeHtml(reason)}</em></p></section>`
     : "";
   const chooseOneNote = request.selectionMode === "one"
     ? `<p class="ask-a-roll-chat-request__note">${escapeHtml(game.i18n!.localize("askaroll.player.chooseOne"))}</p>`
