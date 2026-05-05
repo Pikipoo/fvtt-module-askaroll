@@ -207,11 +207,9 @@ export function buildRequestChatCardContent(request: RollRequest): string {
     ? `<div class="ask-a-roll-chat-request__actor-images">${actorImages}</div>`
     : "";
   const actorSections = request.actorIds
-    .map((actorId) => {
-      const actor = getActorDisplay(actorId);
-
-      return `<section class="ask-a-roll-chat-request__actor"><h4 class="ask-a-roll-chat-request__actor-name">${escapeHtml(actor.name)}</h4><div class="ask-a-roll-chat-request__rolls">${buildRollButtons(request, actorId)}</div></section>`;
-    })
+    .map(
+      (actorId) => `<section class="ask-a-roll-chat-request__actor"><div class="ask-a-roll-chat-request__rolls">${buildRollButtons(request, actorId)}</div></section>`,
+    )
     .join("");
 
   return `<section class="ask-a-roll-chat-request" data-request-id="${escapeHtml(request.requestId)}"><h3>${escapeHtml(game.i18n!.localize("askaroll.player.intro"))}</h3>${actorImageSection}${reasonSection}${visibilitySection}${chooseOneNote}<div class="ask-a-roll-chat-request__actors">${actorSections}</div></section>`;
