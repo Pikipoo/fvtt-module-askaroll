@@ -171,13 +171,16 @@ function getActorDisplay(actorId: ActorId): { readonly name: string; readonly im
   };
 }
 
-function buildRollButtons(request: RollRequest, actorId: ActorId): string {
+function buildRollButtons(request: RollRequest, actorId: ActorId, wrapButtons: boolean): string {
   return request.rolls
     .map((roll) => {
       const rollTypeId = rollDescriptorToRollTypeId(roll);
       const label = rollDescriptorToLabel(roll);
+      const button = `<button type="button" class="ask-a-roll-chat-request__roll-button" data-askaroll-request-roll="true" data-request-id="${escapeHtml(request.requestId)}" data-actor-id="${escapeHtml(actorId)}" data-roll-type-id="${escapeHtml(rollTypeId)}"><span class="ask-a-roll-chat-request__roll-prefix">${escapeHtml(game.i18n!.localize("askaroll.player.roll"))}</span> <span class="ask-a-roll-chat-request__roll-label">${escapeHtml(label)}</span></button>`;
 
-      return `<button type="button" class="ask-a-roll-chat-request__roll-button" data-askaroll-request-roll="true" data-request-id="${escapeHtml(request.requestId)}" data-actor-id="${escapeHtml(actorId)}" data-roll-type-id="${escapeHtml(rollTypeId)}"><span class="ask-a-roll-chat-request__roll-prefix">${escapeHtml(game.i18n!.localize("askaroll.player.roll"))}</span> <span class="ask-a-roll-chat-request__roll-label">${escapeHtml(label)}</span></button>`;
+      return wrapButtons
+        ? `<div class="ask-a-roll-chat-request__roll-row">${button}</div>`
+        : button;
     })
     .join("");
 }
@@ -239,13 +242,20 @@ export function buildRequestChatCardContent(request: RollRequest): string {
   const actorNameSection = actorNameList.length > 0
     ? `<p class="ask-a-roll-chat-request__character-names" title="${escapeHtml(actorNameList)}">${escapeHtml(actorNameList)}</p>`
     : "";
+  const shouldStackRollButtons = request.rolls.length > 1 || request.actorIds.length > 1;
+  const actorListClass = shouldStackRollButtons
+    ? "ask-a-roll-chat-request__actors ask-a-roll-chat-request__actors--stacked"
+    : "ask-a-roll-chat-request__actors";
+  const rollsClass = shouldStackRollButtons
+    ? "ask-a-roll-chat-request__rolls ask-a-roll-chat-request__rolls--stacked"
+    : "ask-a-roll-chat-request__rolls";
   const actorSections = request.actorIds
     .map(
-      (actorId) => `<section class="ask-a-roll-chat-request__actor"><div class="ask-a-roll-chat-request__rolls">${buildRollButtons(request, actorId)}</div></section>`,
+      (actorId) => `<section class="ask-a-roll-chat-request__actor"><div class="${rollsClass}">${buildRollButtons(request, actorId, shouldStackRollButtons)}</div></section>`,
     )
     .join("");
 
-  return `<section class="ask-a-roll-chat-request" data-request-id="${escapeHtml(request.requestId)}">${actorNameSection}<h3>${escapeHtml(game.i18n!.localize("askaroll.player.intro"))}</h3>${actorImageSection}${reasonSection}${visibilitySection}${chooseOneNote}<div class="ask-a-roll-chat-request__actors">${actorSections}</div></section>`;
+  return `<section class="ask-a-roll-chat-request" data-request-id="${escapeHtml(request.requestId)}">${actorNameSection}<h3>${escapeHtml(game.i18n!.localize("askaroll.player.intro"))}</h3>${actorImageSection}${reasonSection}${visibilitySection}${chooseOneNote}<div class="${actorListClass}">${actorSections}</div></section>`;
 }
 
 export function createAskARollRequestChatFlags(

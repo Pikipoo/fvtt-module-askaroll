@@ -111,9 +111,33 @@
   border-radius: 4px;
 }
 
+.ask-a-roll-chat-request__actors--stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .ask-a-roll-chat-request__rolls {
   display: flex;
   justify-content: center;
+}
+
+.ask-a-roll-chat-request__rolls--stacked {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ask-a-roll-chat-request__roll-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.ask-a-roll-chat-request__rolls--stacked .ask-a-roll-chat-request__roll-button {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .ask-a-roll-player-prompt {
