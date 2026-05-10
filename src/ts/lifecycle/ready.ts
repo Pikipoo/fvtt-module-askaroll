@@ -14,10 +14,9 @@ type SceneControlButtons = Record<
 export function registerAskARollReady(): void {
   game.socket?.on(askARollSocketChannel, routeSocketMessage);
   requestChatCardService.registerHooks();
-  Hooks.on("getSceneControlButtons", registerAskARollSceneControlButton);
 }
 
-function registerAskARollSceneControlButton(
+export function registerAskARollSceneControlButton(
   controls: SceneControlButtons
 ): void {
   if (!game.user?.isGM) {
