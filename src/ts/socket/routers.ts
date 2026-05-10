@@ -7,6 +7,7 @@ import type { Wfrp4eRollDescriptor } from "../domain/rolls";
 import type { SystemRollAdapter } from "../systems/adapter";
 import { PlayerRollPromptApp } from "../ui/player/PlayerRollPromptApp";
 import { chatResultService } from "../services/chatResultService";
+import { requestChatCardService } from "../services/requestChatCardService";
 import {
   isAskARollSocketMessage,
   isRequestCreateMessage,
@@ -57,7 +58,16 @@ function routeGmSocketMessage(message: AskARollSocketMessage): void {
       return;
     }
 
-    gmRollRequestService.markSubmitted(message.requestId, message.payload);
+    const accepted = gmRollRequestService.markSubmitted(message.requestId, message.payload);
+    if (!accepted) {
+      return;
+    }
+
+    void requestChatCardService.markCompletedAction(message.requestId, {
+      actorId: message.payload.actorId,
+      rollTypeId: message.payload.rollTypeId,
+      playerUserId: message.payload.playerUserId,
+    });
     void chatResultService.tagChatMessages(message.payload.chatMessageIds, {
       requestId: message.requestId,
       rollTypeId: message.payload.rollTypeId,

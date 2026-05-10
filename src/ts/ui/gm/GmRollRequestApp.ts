@@ -4,8 +4,6 @@ import type { RecipientTargetInput } from "../../domain/recipients";
 import { gmRollRequestService } from "../../services/gmRollRequestService";
 import { notifyWarn } from "../../services/notifications";
 import type { RollVisibility, SelectionMode } from "../../domain/requests";
-import { routeSocketMessage } from "../../socket/routers";
-import { createRequestCreateMessage } from "../../socket/messages";
 import type { Wfrp4eRollDescriptor } from "../../domain/rolls";
 import { getSystemRollAdapter } from "../../systems/registry";
 import { buildRecipientTargetForMode } from "../../services/recipientResolver";
@@ -204,7 +202,6 @@ export class GmRollRequestApp extends HandlebarsApplicationMixin(
       return;
     }
 
-    routeSocketMessage(createRequestCreateMessage(request));
     this.close();
   }
 
