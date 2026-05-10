@@ -24,6 +24,10 @@ export type AdapterResult<T> =
       readonly messageKey: string;
     };
 
+export type RollExecutionContext = {
+  readonly rollMode?: "publicroll" | "gmroll" | "blindroll" | "selfroll";
+};
+
 export type SystemRollDescriptor = {
   readonly system: string;
   readonly type: string;
@@ -43,7 +47,11 @@ export type SystemRollAdapter<
   readonly systemId: string;
   isSupportedActor(actor: unknown): boolean;
   getRollGroups(): AdapterResult<readonly SystemRollGroup<TRoll>[]>;
-  executeRoll(actor: unknown, roll: TRoll): Promise<AdapterResult<unknown>>;
+  executeRoll(
+    actor: unknown,
+    roll: TRoll,
+    context?: RollExecutionContext,
+  ): Promise<AdapterResult<unknown>>;
 };
 
 export const adapterOk = <T>(value: T): AdapterResult<T> => ({ ok: true, value });
@@ -54,6 +62,16 @@ export const adapterUnsupported = <T>(
 ): AdapterResult<T> => ({
   ok: false,
   outcome: "unsupported",
+  reason,
+  messageKey,
+});
+
+export const adapterFailure = <T>(
+  reason: AdapterFailureReason,
+  messageKey: string,
+): AdapterResult<T> => ({
+  ok: false,
+  outcome: "failure",
   reason,
   messageKey,
 });

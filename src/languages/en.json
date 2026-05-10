@@ -35,7 +35,7 @@
   "askaroll.notifications.sent": "Roll request sent.",
   "askaroll.request.cancelled": "Roll request cancelled.",
   "askaroll.player.title": "Roll Request",
-  "askaroll.player.intro": "Your GM requested a roll.",
+  "askaroll.player.intro": "Your GM requested a roll",
   "askaroll.player.reason": "Reason",
   "askaroll.player.visibility.label": "Visibility",
   "askaroll.player.visibility.publicroll": "Public Roll",
@@ -46,8 +46,10 @@
   "askaroll.player.roll": "Roll",
   "askaroll.player.completed": "Roll completed.",
   "askaroll.player.error.invalidActor": "This actor is not part of the roll request.",
+  "askaroll.player.error.userNotTargeted": "This roll request is not assigned to you.",
   "askaroll.player.error.actorPermissionDenied": "You do not have permission to roll for this actor.",
   "askaroll.player.error.rollFailed": "The roll could not be completed. Try again.",
+  "askaroll.chat.error.requestCreateFailed": "The roll request chat prompt could not be created.",
   "askaroll.chat.flavor.requested": "Roll request: {roll}",
   "askaroll.chat.flavor.submitted": "{actor} rolled {roll} for Ask A Roll.",
   "askaroll.chat.flavor.failed": "{actor} could not complete {roll}.",
@@ -67,5 +69,6 @@
   "askaroll.wfrp4e.characteristics.fel": "Fellowship",
   "askaroll.wfrp4e.rolls.unsupportedActor": "This actor cannot make WFRP4e rolls.",
   "askaroll.wfrp4e.rolls.unsupportedRoll": "This WFRP4e roll type is not supported yet.",
-  "askaroll.wfrp4e.rolls.unverifiedRollApi": "WFRP4e roll execution is not available yet."
+  "askaroll.wfrp4e.rolls.rollApiUnavailable": "The WFRP4e actor roll API is unavailable for this actor.",
+  "askaroll.wfrp4e.rolls.rollFailed": "The WFRP4e roll could not be completed."
 }
