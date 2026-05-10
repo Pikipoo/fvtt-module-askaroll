@@ -20,7 +20,7 @@ Ask A Roll should implement the same core lifecycle first for WFRP4e, not LMRTFY
 
 Ask A Roll files inspected:
 
-- `package.json`: scripts are `yarn build`, `yarn watch`, and `yarn clean`; no test or lint script exists.
+- `package.json`: scripts are `bun run build`, `bun run watch`, and `bun run clean`; no test or lint script exists.
 - `tsconfig.json`: strict TypeScript, `fvtt-types`, `noEmit`, `noUnusedLocals`, `noImplicitAny`, and `skipLibCheck`.
 - `vite.config.ts`: builds `src/ts/module.ts`, writes JS to `dist/scripts/module.js`, copies `src/languages` and `src/templates`, and generates `dist/module.json` from `src/module.json`.
 - `src/module.json`: module id `askaroll`, Foundry v13 only, WFRP4e system relationship, `languages/en.json`, `style.css`, and `scripts/module.js`.
@@ -428,9 +428,9 @@ Settings/localization strategy:
 - [x] Add `vitest` as a dev dependency and add scripts `test` and `test:run` to `package.json`.
 - [x] Write failing tests in `src/ts/domain/requests.test.ts` for rejecting an empty actor list, rejecting an empty roll list, and creating a request with `status: "created"`.
 - [x] Implement branded ids, WFRP4e roll descriptors, recipient targets, and `createRollRequest`.
-- [x] Run `yarn test:run src/ts/domain/requests.test.ts` and verify all domain tests pass.
-- [x] Run `yarn build` and verify TypeScript strict mode passes.
-- [x] Commit with `git add package.json yarn.lock src/ts/domain && git commit -m "feat: add roll request domain model"`. Skipped because no commit was requested.
+- [x] Run `bun run test:run src/ts/domain/requests.test.ts` and verify all domain tests pass.
+- [x] Run `bun run build` and verify TypeScript strict mode passes.
+- [x] Commit with `git add package.json bun.lock src/ts/domain && git commit -m "feat: add roll request domain model"`. Skipped because no commit was requested.
 
 Minimal domain test content:
 
@@ -499,7 +499,7 @@ describe("createRollRequest", () => {
 **Risks:**
 
 - `noUnusedLocals` will fail if future-facing types are added before use; add only types used by tests or immediate integration.
-- Adding Vitest changes package scripts and lockfile; if dependency addition is rejected during execution, keep tests as a follow-up and use `yarn build` for this phase.
+- Adding Vitest changes package scripts and lockfile; if dependency addition is rejected during execution, keep tests as a follow-up and use `bun run build` for this phase.
 
 ## Phase 2: Foundry Integration
 
@@ -525,8 +525,8 @@ describe("createRollRequest", () => {
 - [x] Register settings `useTokenImageForActors` and `deselectTokensOnOpen` under namespace `askaroll`.
 - [x] Add a token scene-control button through `Hooks.on("getSceneControlButtons", controls => { ... })` using the v13 hook signature inspected at `hookEvents.getSceneControlButtons`.
 - [x] Remove dog browser template, class, and module API field.
-- [x] Run `yarn build`.
-- [x] Commit with `git add src/ts src/templates src/languages package.json yarn.lock && git commit -m "feat: wire ask a roll lifecycle"`.
+- [x] Run `bun run build`.
+- [x] Commit with `git add src/ts src/templates src/languages package.json bun.lock && git commit -m "feat: wire ask a roll lifecycle"`.
 
 Entry point target shape:
 
@@ -579,8 +579,8 @@ Hooks.once("ready", registerAskARollReady);
 - [x] Implement `getSystemRollAdapter` so it returns the WFRP4e adapter for `game.system.id === "wfrp4e"` and a typed unsupported result otherwise.
 - [x] Implement `executeRoll` as a typed unsupported path until the exact WFRP4e Actor method is verified in manual Foundry testing.
 - [ ] Implement skill roll execution after characteristic execution passes manual testing.
-- [x] Run `yarn test:run src/ts/systems/wfrp4e/guards.test.ts` if tests exist.
-- [x] Run `yarn build`.
+- [x] Run `bun run test:run src/ts/systems/wfrp4e/guards.test.ts` if tests exist.
+- [x] Run `bun run build`.
 - [x] Commit with `git add src/ts/systems src/languages/en.json && git commit -m "feat: add wfrp4e roll adapter"`.
 
 Guard fixture test target:
@@ -633,7 +633,7 @@ describe("isWfrp4eActorSystemData", () => {
 - [x] Wire the scene-control button to render one GM request app instance.
 - [x] Add SCSS classes for actor selection, roll group layout, and submit actions.
 - [x] Run view-model tests if tests exist.
-- [x] Run `yarn build`.
+- [x] Run `bun run build`.
 - [x] Commit with `git add src/ts/ui/gm src/templates/gm-roll-request.hbs src/styles/style.scss src/languages/en.json src/ts/lifecycle/ready.ts && git commit -m "feat: add gm roll request ui"`.
 
 View-model test target:
@@ -692,7 +692,7 @@ describe("buildGmRollRequestViewModel", () => {
 - [x] Implement player service method `performRequestedRoll(requestId, actorId, rollTypeId, event)` with request and actor validation.
 - [x] Disable completed buttons, block duplicate in-flight rolls, and close the prompt according to selection mode.
 - [x] Run view-model tests if tests exist.
-- [x] Run `yarn build`.
+- [x] Run `bun run build`.
 - [x] Commit with `git add src/ts/ui/player src/templates/player-roll-prompt.hbs src/styles/style.scss src/languages/en.json src/ts/services/playerRollRequestService.ts && git commit -m "feat: add player roll prompt"`.
 
 Completion test target:
@@ -757,7 +757,7 @@ describe("shouldClosePrompt", () => {
 - [x] Route locally-created GM request and delivery messages so the active client tracks its own request state.
 - [x] Capture internally-created WFRP4e chat messages with a temporary `preCreateChatMessage` hook for result correlation.
 - [x] Run socket guard tests.
-- [x] Run `yarn build`.
+- [x] Run `bun run build`.
 - [x] Commit with `git add src/ts/socket src/ts/services src/ts/lifecycle/ready.ts src/languages/en.json && git commit -m "feat: add roll request socket lifecycle"`.
 
 Socket guard test target:
@@ -815,7 +815,7 @@ describe("isAskARollSocketMessage", () => {
 - [x] Add localization keys for WFRP4e characteristics.
 - [x] Add localization keys for chat/result flavors.
 - [x] Run a text search for hardcoded visible strings in `src/ts`, `src/templates`, and `src/styles`.
-- [x] Run `yarn build`.
+- [x] Run `bun run build`.
 - [x] Commit with `git add src/languages/en.json src/ts/settings src/ts/services/notifications.ts src/templates && git commit -m "feat: localize roll request workflow"` (not requested).
 
 Initial localization key set:
@@ -876,9 +876,9 @@ Initial localization key set:
 
 **Tasks:**
 
-- [ ] Run `yarn test:run` if Vitest was added.
-- [x] Run `yarn test:run` if Vitest was added.
-- [x] Run `yarn build`.
+- [ ] Run `bun run test:run` if Vitest was added.
+- [x] Run `bun run test:run` if Vitest was added.
+- [x] Run `bun run build`.
 - [ ] In Foundry v13 with WFRP4e, enable Ask A Roll in a test world.
 - [ ] Log in as GM and a non-GM player in separate browser sessions.
 - [ ] Confirm the scene-control button appears for GM and not for player.
@@ -901,13 +901,13 @@ Initial localization key set:
 **Acceptance criteria:**
 
 - Automated pure logic tests pass if the test runner is added.
-- `yarn build` passes.
+- `bun run build` passes.
 - GM and player manual checks pass in a WFRP4e world.
 - Any manual verification failure has a specific follow-up issue or code task before release.
 
 **Risks:**
 
-- Foundry and WFRP4e behavior cannot be fully verified by `yarn build`; manual multi-client testing is required.
+- Foundry and WFRP4e behavior cannot be fully verified by `bun run build`; manual multi-client testing is required.
 - Socket behavior requires at least two connected users to validate properly.
 
 ## Phase 9: Build and Release Verification
@@ -920,8 +920,8 @@ Initial localization key set:
 
 **Tasks:**
 
-- [ ] Run `yarn build`.
-- [x] Run `yarn build`.
+- [ ] Run `bun run build`.
+- [x] Run `bun run build`.
 - [x] Confirm `dist/scripts/module.js` exists.
 - [x] Confirm `dist/style.css` exists, proving the `src/ts/module.ts` style side-effect import still works.
 - [x] Confirm `dist/templates/gm-roll-request.hbs` and `dist/templates/player-roll-prompt.hbs` exist.
@@ -934,7 +934,7 @@ Initial localization key set:
 
 - Build output matches `vite.config.ts` expectations.
 - `src/module.json` remains the manifest source of truth.
-- Release workflow can zip `dist/` after `yarn build` without missing templates or localization files.
+- Release workflow can zip `dist/` after `bun run build` without missing templates or localization files.
 
 **Risks:**
 
@@ -945,7 +945,7 @@ Initial localization key set:
 Expected Ask A Roll files to modify:
 
 - `package.json`: add test scripts if Vitest is accepted; keep `build` unchanged.
-- `yarn.lock`: update only if adding a test dependency.
+- `bun.lock`: update only if adding a test dependency.
 - `src/ts/module.ts`: keep style import; replace dog-browser wiring with lifecycle registration.
 - `src/ts/types.ts`: replace `askaroll` dog-browser interface with an `AskARollModule` shape only if a module API object is needed.
 - `src/ts/constants.ts`: keep `moduleId`; optionally add `socketChannel = `module.${moduleId}`` if not defined in socket module.
@@ -1003,8 +1003,8 @@ Expected files not to touch:
 
 Automated checks:
 
-- Run `yarn build` before claiming implementation complete.
-- If Vitest is added, run `yarn test:run` before `yarn build`.
+- Run `bun run build` before claiming implementation complete.
+- If Vitest is added, run `bun run test:run` before `bun run build`.
 - Add pure tests for domain validation, socket guards, recipient resolution, WFRP4e type guards, and UI view-model completion logic.
 
 Manual Foundry v13 GM checks:
@@ -1054,7 +1054,7 @@ Localization/template checks:
 
 Manifest/build output sanity checks:
 
-- `yarn build` completes.
+- `bun run build` completes.
 - `dist/scripts/module.js` exists.
 - `dist/style.css` exists.
 - `dist/templates/gm-roll-request.hbs` exists.
@@ -1065,7 +1065,7 @@ Manifest/build output sanity checks:
 
 # Deployment/Release Checklist
 
-- Run `yarn build` locally.
+- Run `bun run build` locally.
 - Confirm `src/module.json` is the manifest source of truth.
 - Confirm `vite.config.ts` still writes `dist/module.json` from `src/module.json`.
 - Confirm release-time version, manifest URL, and download URL behavior remains controlled by `MODULE_VERSION`, `GH_PROJECT`, and `GH_TAG` in `vite.config.ts`.
@@ -1079,7 +1079,7 @@ Questions that block implementation decisions:
 
 1. Which exact WFRP4e Actor methods and option objects should Ask A Roll call for characteristic and skill rolls in Foundry v13?
 2. Should custom formula requests be included in the first WFRP4e release if characteristic and skill requests already cover the core use case?
-3. Should Ask A Roll add Vitest now for pure TypeScript tests, or keep the first milestone limited to `yarn build` plus manual Foundry verification?
+3. Should Ask A Roll add Vitest now for pure TypeScript tests, or keep the first milestone limited to `bun run build` plus manual Foundry verification?
 
 Assumptions used by this plan:
 

@@ -5,8 +5,8 @@ Phase 8 verification checklist for Ask A Roll in Foundry VTT v13 with the WFRP4e
 ## Automated verification
 
 - Date: 2026-04-27
-- `yarn test:run`: Pass — 8 test files passed, 35 tests passed.
-- `yarn build`: Pass — `tsc && vite build`; Vite built `dist/style.css` and `dist/scripts/module.js` successfully.
+- `bun run test:run`: Pass — 8 test files passed, 35 tests passed.
+- `bun run build`: Pass — `tsc && vite build`; Vite built `dist/style.css` and `dist/scripts/module.js` successfully.
 - Failures: None recorded during Phase 8 automated verification.
 
 ## Manual test setup

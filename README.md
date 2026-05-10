@@ -1,22 +1,60 @@
-# FoundryVTT Module Template w/ Typescript
+# Ask A Roll
 
-This repo is meant to be used as a starting point for creating your own FoundryVTT module with [Typescript][2]. If you are using Github you can get started by clicking the green `Use this template` button in the upper-right.
+Ask A Roll is a Foundry VTT module for Game Masters who want to request rolls from their players.
 
-Check out [our blog post][4] for a walkthrough of the codebase.
+The current module targets WFRP4e and Foundry VTT 13. It is built with TypeScript, Vite, and Bun.
 
-## What's in the box
+## Compatibility
 
-Out of the box this template adds a button to the top of the Actors directory. Clicking it brings up a modal with a button that will load a picture of a random dog from the [Dog API][3]. This demonstrates how to perform some common tasks such as render templates and call external APIs, and hopefully provides a decent starting point for developing your own module.
+- Foundry VTT: 13 only
+- System: WFRP4e
 
-## Todo
+This scope is defined in `src/module.json`.
 
-If you have just created a new project with this template there are a few changes you should make to start:
+## Quick Start
 
-- [X] Update the values in `src/module.json`. At minimum you should change `id`, `title`, and `description`. It is also recommended that you add a `contacts` field.
-- [X] Start using a new module prefix for localizations. The localizations in `src/languages/en.json` are all prefixed with `MYMODULE.` to distinguish them from any other installed translations. You should choose a new prefix for your module and use it for any new translations you add, and remove the existing translation entries as they become unnecessary.
+Install dependencies:
 
+```bash
+bun install
+```
 
-[1]: https://foundryvtt.com/
-[2]: https://www.typescriptlang.org/
-[3]: https://dog.ceo/dog-api/
-[4]: https://bringingfire.com/blog/intro-to-foundry-module-development
+Build the module:
+
+```bash
+bun run build
+```
+
+Watch and rebuild during development:
+
+```bash
+bun run watch
+```
+
+The build writes the distributable module to `dist/`.
+
+## Project Layout
+
+- `src/module.json`: Foundry manifest source of truth.
+- `src/ts/module.ts`: Runtime entry point loaded by Foundry.
+- `src/ts/lifecycle/`: Foundry hook setup.
+- `src/ts/domain/`: Roll request domain types and validation.
+- `src/ts/services/`: Request, recipient, roll, and notification logic.
+- `src/ts/socket/`: GM/player socket messages and routing.
+- `src/ts/systems/`: System adapter boundary.
+- `src/ts/systems/wfrp4e/`: WFRP4e roll support.
+- `src/ts/ui/`: GM and player application UI.
+- `src/styles/`: SCSS bundled into `dist/style.css`.
+- `src/templates/` and `src/languages/`: Copied into `dist/` during build.
+
+## Build Notes
+
+`bun run build` runs TypeScript checking first, then Vite.
+
+Vite builds `src/ts/module.ts` into `dist/scripts/module.js`, emits `dist/style.css`, copies templates and languages, and generates `dist/module.json`.
+
+Do not edit files in `dist/` by hand. Update source files under `src/` instead.
+
+## License
+
+MIT.
