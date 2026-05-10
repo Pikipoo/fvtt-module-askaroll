@@ -4,6 +4,7 @@
   "description": "Ask your players to make rolls for you.",
   "license": "MIT",
   "private": true,
+  "packageManager": "bun@1.3.13",
   "scripts": {
     "build": "tsc && vite build",
     "test": "vitest",
